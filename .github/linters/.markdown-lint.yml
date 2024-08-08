@@ -1,0 +1,12 @@
+---
+###############
+# Rules by id #
+###############
+
+MD034: false # Emphasis used instead of a heading
+MD013:
+  line_length: 400 # Line length 80 is far too short
+MD033: false # Allow inline HTML
+MD026:
+  punctuation: ".,;:!。，；:" # List of not allowed
+MD029: false # Ordered list item prefix
