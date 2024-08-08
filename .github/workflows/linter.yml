@@ -27,7 +27,7 @@ jobs:
         run: cat .github/linter.env >> "$GITHUB_ENV"
 
       - name: Lint Code Base
-        uses: super-linter/super-linter@v5
+        uses: super-linter/super-linter@v6
         env:
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
