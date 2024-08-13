@@ -13,7 +13,13 @@ const app = express()
 const PORT = process.env.PORT || 5000
 
 app.use(fileUpload())
-app.use(cors())
+app.use(
+  cors({
+    origin: "https://rbtc-audio-converter.darikletter.de",
+    methods: ["POST"],
+  }),
+)
+
 app.use("/.well-known", healthCheckController())
 
 // Serve static files from the Vite build directory
