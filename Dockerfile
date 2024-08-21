@@ -6,8 +6,8 @@ WORKDIR /usr/src/app
 
 # Install ffmpeg and eyeD3
 RUN apt-get update && \
-    apt-get install -y ffmpeg python3 python3-pip && \
-    pip3 install eyeD3
+  apt-get install -y ffmpeg python3 python3-pip && \
+  pip3 install eyeD3
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
@@ -22,4 +22,4 @@ COPY ./server .
 EXPOSE 5000
 
 # Run the app
-CMD ["node", "index.js"]
+CMD ["URL=https://rbtc-audio-converter.darikletter.de", "node", "index.js"]

@@ -2,9 +2,8 @@
   "name": "rbtc-audio-convertor-backend",
   "version": "1.0.0",
   "scripts": {
-    "start": "node index.js",
-    "start:heroku": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
   },
   "author": "Darius Kletter <darikletter@gmail.com>",
   "license": "MIT",

@@ -11,11 +11,12 @@ const healthCheckController = require("./controller/health-check-controller")
 
 const app = express()
 const PORT = process.env.PORT || 5000
+const URL = process.env.URL || "http://localhost:5173"
 
 app.use(fileUpload())
 app.use(
   cors({
-    origin: "https://rbtc-audio-converter.darikletter.de",
+    origin: URL,
     methods: ["POST"],
   }),
 )
@@ -76,17 +77,22 @@ app.post("/api/upload", async (req, res) => {
     res.download(zipFilePath, "converted_files.zip", async (err) => {
       if (err) {
         console.error("Error downloading the file:", err)
-        res.status(500).send("Error downloading the file")
-
+        // Clean up directories even on download error
         await cleanupDirectories([uploadDir, processedDir, downloadDir])
-      } else {
-        // Clean up directories after download
-        await cleanupDirectories([uploadDir, processedDir, downloadDir])
+        // Avoid attempting to send another response
+        return res.status(500).send("Error downloading the file")
       }
+
+      // Clean up directories after successful download
+      await cleanupDirectories([uploadDir, processedDir, downloadDir])
     })
   } catch (error) {
     console.error("Error processing the upload:", error)
-    res.status(500).send("Internal Server Error")
+    // If an error occurs and no response has been sent yet, send a response
+    if (!res.headersSent) {
+      return res.status(500).send("Internal Server Error")
+    }
+    // If headers are already sent, log the error and avoid sending another response
   }
 })
 
@@ -129,12 +135,14 @@ const processFiles = (
 
         const command = `ffmpeg -i "${filePath}" -q:a 0 -map a "${outputPath}" && eyeD3 --add-image="${logoPath}":FRONT_COVER --artist="${teacher}" --title="${newFilename}" --album="${subject}" --track="${index + 1}" --to-v2.4 "${outputPath}"`
 
-        exec(command, (error) => {
+        exec(command, { maxBuffer: 1024 * 1024 }, (error, stdout, stderr) => {
           if (error) {
+            console.error(`Error executing command: ${stderr}`)
             return reject(error)
-          } else {
-            return resolve(outputPath)
           }
+
+          console.log(`Command output: ${stdout}`)
+          resolve(outputPath)
         })
       })
     }),
