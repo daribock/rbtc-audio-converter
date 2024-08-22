@@ -1,7 +1,6 @@
 const express = require("express")
 const fileUpload = require("express-fileupload")
 const path = require("path")
-const cors = require("cors")
 const fs = require("fs")
 const { exec } = require("child_process")
 const archiver = require("archiver")
@@ -13,20 +12,39 @@ const app = express()
 const PORT = process.env.PORT || 5000
 const URL = process.env.URL || "http://localhost:5173"
 
+const whitelist = [URL]
+
+// Custom CORS middleware
+const customCorsMiddleware = (req, res, next) => {
+  const origin = req.headers.origin
+
+  // Check if the origin is in the whitelist
+  if (whitelist.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin)
+    res.header("Access-Control-Allow-Methods", "POST")
+    res.header("Access-Control-Allow-Headers", "Content-Type")
+    next()
+  } else {
+    console.warn(`Blocked request from origin: ${origin}`)
+    res.status(403).send("Forbidden: Origin not allowed")
+  }
+}
+
+// Initialize Middleware
+app.use(customCorsMiddleware)
 app.use(fileUpload())
-app.use(
-  cors({
-    origin: URL,
-    methods: ["POST"],
-  }),
-)
 
 app.use("/.well-known", healthCheckController())
 
-// Serve static files from the Vite build directory
-app.use("/", express.static(path.join(__dirname, "../client/dist")))
-
 app.post("/api/upload", async (req, res) => {
+  const requestId = uuidv4() // Unique request ID
+  const logoPath = path.join(__dirname, "logo.jpg")
+
+  // Unique directories for each request
+  const uploadDir = path.join(__dirname, `uploads_${requestId}`)
+  const processedDir = path.join(__dirname, `processed_${requestId}`)
+  const downloadDir = path.join(__dirname, `downloads_${requestId}`)
+
   try {
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).send("No files were uploaded.")
@@ -43,14 +61,6 @@ app.post("/api/upload", async (req, res) => {
 
     // Ensure files are in an array
     const filesArray = Array.isArray(files) ? files : [files]
-
-    const requestId = uuidv4() // Unique request ID
-    const logoPath = path.join(__dirname, "logo.jpg")
-
-    // Unique directories for each request
-    const uploadDir = path.join(__dirname, `uploads_${requestId}`)
-    const processedDir = path.join(__dirname, `processed_${requestId}`)
-    const downloadDir = path.join(__dirname, `downloads_${requestId}`)
 
     await createDirectories([uploadDir, processedDir, downloadDir])
 
@@ -77,22 +87,18 @@ app.post("/api/upload", async (req, res) => {
     res.download(zipFilePath, "converted_files.zip", async (err) => {
       if (err) {
         console.error("Error downloading the file:", err)
-        // Clean up directories even on download error
-        await cleanupDirectories([uploadDir, processedDir, downloadDir])
-        // Avoid attempting to send another response
-        return res.status(500).send("Error downloading the file")
       }
-
-      // Clean up directories after successful download
-      await cleanupDirectories([uploadDir, processedDir, downloadDir])
     })
   } catch (error) {
     console.error("Error processing the upload:", error)
-    // If an error occurs and no response has been sent yet, send a response
+
+    // Check if headers are already sent
     if (!res.headersSent) {
-      return res.status(500).send("Internal Server Error")
+      res.status(500).send("Internal Server Error")
     }
-    // If headers are already sent, log the error and avoid sending another response
+  } finally {
+    // Cleanup directories after processing is complete, regardless of success or failure
+    await cleanupDirectories([uploadDir, processedDir, downloadDir])
   }
 })
 
@@ -135,14 +141,12 @@ const processFiles = (
 
         const command = `ffmpeg -i "${filePath}" -q:a 0 -map a "${outputPath}" && eyeD3 --add-image="${logoPath}":FRONT_COVER --artist="${teacher}" --title="${newFilename}" --album="${subject}" --track="${index + 1}" --to-v2.4 "${outputPath}"`
 
-        exec(command, { maxBuffer: 1024 * 1024 }, (error, stdout, stderr) => {
+        exec(command, (error) => {
           if (error) {
-            console.error(`Error executing command: ${stderr}`)
             return reject(error)
+          } else {
+            return resolve(outputPath)
           }
-
-          console.log(`Command output: ${stdout}`)
-          resolve(outputPath)
         })
       })
     }),
@@ -167,11 +171,18 @@ const createZipFile = (processedFiles, downloadDir) => {
 }
 
 const cleanupDirectories = async (directories) => {
-  return Promise.all(
-    directories.map((dir) =>
-      fs.promises.rm(dir, { recursive: true, force: true }),
-    ),
-  )
+  try {
+    await Promise.all(
+      directories.map(async (dir) => {
+        if (fs.existsSync(dir)) {
+          await fs.promises.rm(dir, { recursive: true, force: true })
+        }
+      }),
+    )
+    console.log("Cleanup successful")
+  } catch (error) {
+    console.error("Error during cleanup:", error)
+  }
 }
 
 app.listen(PORT, () => {
