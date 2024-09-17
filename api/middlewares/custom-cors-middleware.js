@@ -1,6 +1,6 @@
-import logger from "../logger/logger.js"
+import logger from "../utils/logger.js"
 
-const URL = process.env.URL || "http://localhost:5173"
+const URL = process.env.URL || "http://localhost:3001"
 
 const whitelist = [URL]
 
