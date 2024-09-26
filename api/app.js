@@ -34,7 +34,10 @@ app.get("/upload/status", (req, res) => {
   logRequestDetails(req)
 
   const uniqueFileId = String(req.headers["x-file-name"])
+  const uniqueJobId = String(req.headers["x-job-id"])
+  const uploadId = uniqueJobId + "_" + uniqueFileId
   const fileSize = parseInt(String(req.headers["file-size"]), 10)
+  const jobDir = dest + `${uniqueJobId}/`
 
   if (!fs.existsSync(dest)) {
     logger.warn(`Destination folder ${dest} does not exist. Creating...`)
@@ -61,7 +64,7 @@ app.get("/upload/status", (req, res) => {
 
   if (uniqueFileId) {
     try {
-      const stats = fs.statSync(dest + uniqueFileId)
+      const stats = fs.statSync(jobDir + uniqueFileId)
       if (stats.isFile()) {
         if (fileSize === stats.size) {
           logger.info(`File ${uniqueFileId} is already fully uploaded.`)
@@ -71,13 +74,13 @@ app.get("/upload/status", (req, res) => {
           })
           return
         }
-        if (!uploads[uniqueFileId]) uploads[uniqueFileId] = {}
-        uploads[uniqueFileId]["bytesReceived"] = stats.size
+        if (!uploads[uploadId]) uploads[uploadId] = {}
+        uploads[uploadId]["bytesReceived"] = stats.size
         logger.info(`File ${uniqueFileId} has ${stats.size} bytes uploaded.`)
         res.send({ uploaded: stats.size })
       }
     } catch (err) {
-      const upload = uploads[uniqueFileId]
+      const upload = uploads[uploadId]
       if (upload) {
         logger.info(
           `Resuming file upload for ${uniqueFileId}, uploaded: ${upload.bytesReceived}`,
@@ -97,20 +100,27 @@ app.post("/upload/files", (req, res) => {
   logRequestDetails(req)
 
   const uniqueFileId = String(req.headers["x-file-name"])
+  const uniqueJobId = String(req.headers["x-job-id"])
+  const uploadId = uniqueJobId + "_" + uniqueFileId
   const match = req.headers["content-range"].match(/(\d+)-(\d+)\/(\d+)/)
   const start = parseInt(match[1])
   const fileSize = parseInt(String(req.headers["file-size"]), 10)
 
-  if (!fs.existsSync(dest)) {
+  const jobDir = dest + `${uniqueJobId}`
+
+  logger.info(
+    `Received file upload request for ${uploadId}, job id is ${uniqueJobId}`,
+  )
+
+  if (!fs.existsSync(jobDir)) {
     logger.warn(`Destination folder ${dest} does not exist. Creating...`)
-    fs.mkdirSync(dest)
+    fs.mkdirSync(jobDir, { recursive: true })
   }
 
-  if (
-    uploads[uniqueFileId] &&
-    fileSize === uploads[uniqueFileId].bytesReceived
-  ) {
-    logger.info(`File ${uniqueFileId} already uploaded completely`)
+  if (uploads[uploadId] && fileSize === uploads[uploadId].bytesReceived) {
+    logger.info(
+      `File ${uniqueFileId} already uploaded completely with the job ${uniqueJobId}`,
+    )
     res.status(200).send("File already uploaded")
     res.end()
     return
@@ -123,15 +133,15 @@ app.post("/upload/files", (req, res) => {
     return
   }
 
-  if (!uploads[uniqueFileId]) uploads[uniqueFileId] = {}
-  const upload = uploads[uniqueFileId]
+  if (!uploads[uploadId]) uploads[uploadId] = {}
+  const upload = uploads[uploadId]
 
   let fileStream
 
   if (!start) {
     upload.bytesReceived = 0
-    logger.info(`Starting new file upload for ${uniqueFileId}`)
-    fileStream = fs.createWriteStream(`./uploads/${uniqueFileId}`, {
+    logger.info(`Starting new file upload for ${uploadId}`)
+    fileStream = fs.createWriteStream(`./${jobDir}/${uniqueFileId}`, {
       flags: "w",
     })
   } else {
@@ -143,8 +153,8 @@ app.post("/upload/files", (req, res) => {
       res.end(upload.bytesReceived)
       return
     }
-    logger.info(`Resuming file upload for ${uniqueFileId} from byte ${start}`)
-    fileStream = fs.createWriteStream(`./uploads/${uniqueFileId}`, {
+    logger.info(`Resuming file upload for ${uploadId} from byte ${start}`)
+    fileStream = fs.createWriteStream(`./${jobDir}/${uniqueFileId}`, {
       flags: "a",
     })
   }
@@ -157,13 +167,13 @@ app.post("/upload/files", (req, res) => {
 
   // when the request is finished, and all its data is written
   fileStream.on("close", function () {
-    logger.info(`File upload complete for ${uniqueFileId}`)
+    logger.info(`File upload complete for ${uploadId}`)
     res.status(201).send({ status: "UPLOAD_COMPLETE" })
   })
 
   // in case of I/O error - finish the request
   fileStream.on("error", function (_err) {
-    logger.error(`File upload error for ${uniqueFileId}: ${_err.message}`)
+    logger.error(`File upload error for ${uploadId}: ${_err.message}`)
     res.status(500).send("File error")
     res.end()
   })
@@ -173,9 +183,11 @@ app.post("/upload/complete", (req, res) => {
   logRequestDetails(req)
 
   const uniqueFileId = String(req.headers["x-file-name"])
-  delete uploads[uniqueFileId]
+  const uniqueJobId = String(req.headers["x-job-id"])
+  const uploadId = uniqueJobId + "_" + uniqueFileId
+  delete uploads[uploadId]
 
-  logger.info(`File upload process completed for ${uniqueFileId}`)
+  logger.info(`File upload process completed for ${uploadId}`)
   res.status(201).send({ status: "SUCCESSFULLY_UPLOADED" })
 })
 
