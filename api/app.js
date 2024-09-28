@@ -1,8 +1,8 @@
-// import customCorsMiddleware from "./middlewares/custom-cors-middleware.js"
 import cors from "cors"
 import express from "express"
 import fs from "fs"
 import logger from "./utils/logger.js"
+import errorHandler from "./middlewares/error-handler.js"
 
 const PORT = process.env.PORT || 8000
 const app = express()
@@ -22,15 +22,15 @@ const logRequestDetails = (req) => {
 
 app.get("/", (req, res) => {
   logRequestDetails(req)
-  res.send("Hello World!")
+  return res.send("Hello World!")
 })
 
 app.post("/", function (req, res) {
   logRequestDetails(req)
-  res.send("Got a POST request")
+  return res.send("Got a POST request")
 })
 
-app.get("/upload/status", (req, res) => {
+app.get("/upload/status", (req, res, next) => {
   logRequestDetails(req)
 
   const uniqueFileId = String(req.headers["x-file-name"])
@@ -45,17 +45,21 @@ app.get("/upload/status", (req, res) => {
   }
 
   if (!fileSize) {
-    logger.error("No file-size header found in the request")
-    res.status(400).send("No file-size header found")
-    res.end(400)
-    return
+    const error = new Error("No file-size header found")
+    error.status = 400
+    return next(error)
   }
 
   if (!uniqueFileId) {
-    logger.error("No x-file-name header found in the request")
-    res.status(400).send("No x-file-name header found")
-    res.end(400)
-    return
+    const error = new Error("No x-file-name header found")
+    error.status = 400
+    return next(error)
+  }
+
+  if (!uniqueJobId) {
+    const error = new Error("No x-job-id header found")
+    error.status = 400
+    return next(error)
   }
 
   logger.info(
@@ -68,16 +72,15 @@ app.get("/upload/status", (req, res) => {
       if (stats.isFile()) {
         if (fileSize === stats.size) {
           logger.info(`File ${uniqueFileId} is already fully uploaded.`)
-          res.send({
+          return res.send({
             status: "ALREADY_UPLOADED_FILE",
             uploaded: stats.size,
           })
-          return
         }
         if (!uploads[uploadId]) uploads[uploadId] = {}
         uploads[uploadId]["bytesReceived"] = stats.size
         logger.info(`File ${uniqueFileId} has ${stats.size} bytes uploaded.`)
-        res.send({ uploaded: stats.size })
+        return res.send({ uploaded: stats.size })
       }
     } catch (err) {
       const upload = uploads[uploadId]
@@ -85,10 +88,13 @@ app.get("/upload/status", (req, res) => {
         logger.info(
           `Resuming file upload for ${uniqueFileId}, uploaded: ${upload.bytesReceived}`,
         )
-        res.send({ uploaded: upload.bytesReceived, status: "RESUMED_FILE" })
+        return res.send({
+          uploaded: upload.bytesReceived,
+          status: "RESUMED_FILE",
+        })
       } else {
         logger.info(`New file upload initiated for ${uniqueFileId}`)
-        res.send({ uploaded: 0, status: "NEW_FILE" })
+        return res.send({ uploaded: 0, status: "NEW_FILE" })
       }
     }
   }
@@ -96,7 +102,7 @@ app.get("/upload/status", (req, res) => {
 
 let uploads = {}
 
-app.post("/upload/files", (req, res) => {
+app.post("/upload/files", (req, res, next) => {
   logRequestDetails(req)
 
   const uniqueFileId = String(req.headers["x-file-name"])
@@ -121,16 +127,19 @@ app.post("/upload/files", (req, res) => {
     logger.info(
       `File ${uniqueFileId} already uploaded completely with the job ${uniqueJobId}`,
     )
-    res.status(200).send("File already uploaded")
-    res.end()
-    return
+    return res.status(200).send("File already uploaded")
   }
 
   if (!uniqueFileId) {
-    logger.error("No x-file-name header found in upload/files request")
-    res.status(400).send("No x-file-name header found")
-    res.end(400)
-    return
+    const error = new Error(`No x-file-name header found`)
+    error.status = 400
+    return next(error)
+  }
+
+  if (!uniqueJobId) {
+    const error = new Error("No x-job-id header found")
+    error.status = 400
+    return next(error)
   }
 
   if (!uploads[uploadId]) uploads[uploadId] = {}
@@ -168,28 +177,45 @@ app.post("/upload/files", (req, res) => {
   // when the request is finished, and all its data is written
   fileStream.on("close", function () {
     logger.info(`File upload complete for ${uploadId}`)
-    res.status(201).send({ status: "UPLOAD_COMPLETE" })
+    return res.status(201).send({ status: "UPLOAD_COMPLETE" })
   })
 
   // in case of I/O error - finish the request
   fileStream.on("error", function (_err) {
-    logger.error(`File upload error for ${uploadId}: ${_err.message}`)
-    res.status(500).send("File error")
-    res.end()
+    const error = new Error(
+      `File upload error for ${uploadId}: ${_err.message}`,
+    )
+    error.status = 500
+    return next(error)
   })
 })
 
-app.post("/upload/complete", (req, res) => {
+app.post("/upload/complete", (req, res, next) => {
   logRequestDetails(req)
 
   const uniqueFileId = String(req.headers["x-file-name"])
   const uniqueJobId = String(req.headers["x-job-id"])
+
+  if (!uniqueFileId) {
+    const error = new Error(`No x-file-name header found`)
+    error.status = 400
+    return next(error)
+  }
+
+  if (!uniqueJobId) {
+    const error = new Error("No x-job-id header found")
+    error.status = 400
+    return next(error)
+  }
+
   const uploadId = uniqueJobId + "_" + uniqueFileId
   delete uploads[uploadId]
 
   logger.info(`File upload process completed for ${uploadId}`)
-  res.status(201).send({ status: "SUCCESSFULLY_UPLOADED" })
+  return res.status(201).send({ status: "SUCCESSFULLY_UPLOADED" })
 })
+
+app.use(errorHandler)
 
 app.listen(PORT, () => {
   logger.info(`Example app listening at http://localhost:${PORT}`)

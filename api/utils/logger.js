@@ -4,8 +4,13 @@ const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format.printf(({ timestamp, level, message }) => {
-      return `${timestamp} [${level.toUpperCase()}]: ${message}`
+    winston.format.printf(({ timestamp, level, message, ...args }) => {
+      const meta =
+        process.env.NODE_ENV === "production"
+          ? undefined
+          : `; Meta: ${JSON.stringify({ ...args })}`
+
+      return `${timestamp} [${level.toUpperCase()}]: ${message}${meta}`
     }),
   ),
   transports: [
