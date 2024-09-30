@@ -1,0 +1,7 @@
+version: "3.8"
+
+services:
+  redis:
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./config:/usr/local/etc/redis/ # Configuration stored in the 'config' folder

@@ -1,5 +1,6 @@
 import cors from "cors"
 import express from "express"
+import helmet from "helmet"
 import fs from "fs"
 import logger from "./utils/logger.js"
 import errorHandler from "./middlewares/error-handler.js"
@@ -11,6 +12,7 @@ app.use(express.json())
 
 // Initialize Middleware
 app.use(cors({ origin: "*" }))
+app.use(helmet())
 
 const dest = "uploads/"
 
