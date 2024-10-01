@@ -10,7 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "archiver": "^7.0.1",
-    "express": "^4.19.2",
+    "express": "^4.21.0",
     "express-fileupload": "^1.5.0",
     "uuid": "^10.0.0",
     "winston": "^3.14.2"
