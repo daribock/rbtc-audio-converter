@@ -1,7 +1,7 @@
-import logger from "./utils/logger.js"
-import { processFile } from "./services/file-service.js"
+import logger from "../utils/logger.js"
+import { processFile } from "../services/file-service.js"
 
-export default async function jobProcessor(job) {
+export default async function fileProcessor(job) {
   const { jobId, fileName, filePath, totalFiles, fileNumber } = job.data
 
   await job.log(`Started processing job with id ${job.id}`)

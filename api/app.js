@@ -4,20 +4,25 @@ import helmet from "helmet"
 import fs from "fs"
 import logger from "./utils/logger.js"
 import errorHandler from "./middlewares/error-handler.js"
-import {
-  addJobToFileProcessorQueue,
-  fileProcessorQueue,
-} from "./queues/file-processor-queue.js"
+import { fileProcessorQueue } from "./queues/file-processor-queue.js"
+import { FlowProducer } from "bullmq"
 import { getAllFilesInDir } from "./utils/file-utils.js"
 import { ExpressAdapter } from "@bull-board/express"
 import { createBullBoard } from "@bull-board/api"
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter.js"
+import { DEFAULT_JOB_REMOVE_CONFIG } from "./config/config.js"
+import { createZipFolderQueue } from "./queues/create-zip-folder-queue.js"
 
 const PORT = process.env.PORT || 8000
 
+const flowProducer = new FlowProducer()
+
 const serverAdapter = new ExpressAdapter()
 createBullBoard({
-  queues: [new BullMQAdapter(fileProcessorQueue)],
+  queues: [
+    new BullMQAdapter(fileProcessorQueue),
+    new BullMQAdapter(createZipFolderQueue),
+  ],
   serverAdapter: serverAdapter,
 })
 serverAdapter.setBasePath("/admin/queues")
@@ -234,7 +239,7 @@ app.post("/upload/complete", (req, res, next) => {
   return res.status(201).send({ status: "SUCCESSFULLY_UPLOADED" })
 })
 
-app.post("/files/process", async (req, res, next) => {
+app.post("/convert/files", async (req, res, next) => {
   const uniqueJobId = String(req.headers["x-job-id"])
 
   if (!uniqueJobId) {
@@ -247,24 +252,32 @@ app.post("/files/process", async (req, res, next) => {
 
   await getAllFilesInDir(filesDir)
     .then(async (files) => {
-      for (const file of files) {
-        const data = {
-          jobId: uniqueJobId,
-          fileName: file.or,
-          filePath: file.path,
-          totalFiles: files.length,
-          fileNumber: files.indexOf(file) + 1,
-        }
-
-        try {
-          await addJobToFileProcessorQueue(data)
-        } catch (err) {
-          const error = new Error(
-            `Failed to add job to file processor queue: ${uniqueJobId}`,
-          )
-          error.status = 400
-          return next(error)
-        }
+      try {
+        logger.info("Creating flow")
+        await flowProducer.add({
+          name: "create-zip-folder",
+          queueName: "createZipFolderQueue",
+          children: files.map((file) => {
+            return {
+              name: "processFile",
+              queueName: "fileProcessorQueue",
+              data: {
+                jobId: uniqueJobId,
+                fileName: file.name,
+                filePath: file.path,
+                totalFiles: files.length,
+                fileNumber: files.indexOf(file) + 1,
+              },
+              ...DEFAULT_JOB_REMOVE_CONFIG,
+            }
+          }),
+        })
+      } catch (err) {
+        const error = new Error(
+          `Failed to add job to file processor queue: ${uniqueJobId}`,
+        )
+        error.status = 400
+        return next(error)
       }
 
       res.status(200).send({ status: "FILE_PROCESS_STARTED" })

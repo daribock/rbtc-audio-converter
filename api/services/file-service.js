@@ -36,10 +36,8 @@ export const processFile = async (
         }
       })
     })
-
-    return outputPath
   } catch (error) {
-    error("Error processing file:", fileName, error)
+    logger.error("Error processing file:", fileName, error)
     throw error
   }
 }

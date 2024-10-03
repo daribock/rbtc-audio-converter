@@ -8,10 +8,14 @@ import logger from "./utils/logger.js"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const processorPath = path.join(__dirname, "file-processor.js")
+const fileProcessorPath = path.join(__dirname, "processors/file-processor.js")
+const zipFolderProcessor = path.join(
+  __dirname,
+  "processors/zip-folder-processor.js",
+)
 
-export function setUpWorker() {
-  const worker = new Worker("fileProcessorQueue", processorPath, {
+export const fileProcessorWorker = () => {
+  const worker = new Worker("fileProcessorQueue", fileProcessorPath, {
     connection: {
       host: REDIS_QUEUE_HOST,
       port: REDIS_QUEUE_PORT,
@@ -19,8 +23,8 @@ export function setUpWorker() {
     autorun: true,
   })
 
-  worker.on("completed", (job, returnValue) => {
-    logger.info(`Completed job with id ${job.id}`, returnValue)
+  worker.on("completed", (job) => {
+    logger.info(`Completed job with id ${job.id}`)
   })
 
   worker.on("active", (job) => {
@@ -29,5 +33,27 @@ export function setUpWorker() {
 
   worker.on("error", (failedReason) => {
     logger.error(`Job encountered an error`, failedReason)
+  })
+}
+
+export const createZipFolderWorker = () => {
+  const worker = new Worker("createZipFolderQueue", zipFolderProcessor, {
+    connection: {
+      host: REDIS_QUEUE_HOST,
+      port: REDIS_QUEUE_PORT,
+    },
+    autorun: true,
+  })
+
+  worker.on("completed", (job) => {
+    logger.info(`Completed zip folder creation job with id ${job.id}`)
+  })
+
+  worker.on("active", (job) => {
+    logger.info(`Completed zip folder creation job with id ${job.id}`)
+  })
+
+  worker.on("error", (failedReason) => {
+    logger.error(`Zip folder creation job encountered an error`, failedReason)
   })
 }

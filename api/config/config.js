@@ -12,3 +12,14 @@ export const REDIS_QUEUE_PORT = process.env.REDIS_QUEUE_PORT
 
 // Define the logo path
 export const LOGO_PATH = path.join(__dirname, "../assets/logo.png")
+
+// Default BullMQ jobs remove config
+export const DEFAULT_JOB_REMOVE_CONFIG = {
+  removeOnComplete: {
+    age: 3600,
+    count: 5,
+  },
+  removeOnFail: {
+    age: 24 * 3600,
+  },
+}
