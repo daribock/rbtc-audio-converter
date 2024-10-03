@@ -1,5 +1,4 @@
 import logger from "../utils/logger.js"
-import { processFile } from "../services/file-service.js"
 
 export default async function fileProcessor(job) {
   const { jobId, fileName, filePath, totalFiles, fileNumber } = job.data

@@ -23,3 +23,5 @@ export const DEFAULT_JOB_REMOVE_CONFIG = {
     age: 24 * 3600,
   },
 }
+
+export const UPLOAD_DIR = "uploads/"
