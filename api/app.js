@@ -4,10 +4,24 @@ import helmet from "helmet"
 import fs from "fs"
 import logger from "./utils/logger.js"
 import errorHandler from "./middlewares/error-handler.js"
-import { addJobToFileProcessorQueue } from "./queue.js"
+import {
+  addJobToFileProcessorQueue,
+  fileProcessorQueue,
+} from "./queues/file-processor-queue.js"
 import { getAllFilesInDir } from "./utils/file-utils.js"
+import { ExpressAdapter } from "@bull-board/express"
+import { createBullBoard } from "@bull-board/api"
+import { BullMQAdapter } from "@bull-board/api/bullMQAdapter.js"
 
 const PORT = process.env.PORT || 8000
+
+const serverAdapter = new ExpressAdapter()
+createBullBoard({
+  queues: [new BullMQAdapter(fileProcessorQueue)],
+  serverAdapter: serverAdapter,
+})
+serverAdapter.setBasePath("/admin/queues")
+
 const app = express()
 
 app.use(express.json())
@@ -15,6 +29,7 @@ app.use(express.json())
 // Initialize Middleware
 app.use(cors({ origin: "*" }))
 app.use(helmet())
+app.use("/admin/queues", serverAdapter.getRouter())
 
 const dest = "uploads/"
 
@@ -266,4 +281,6 @@ app.use(errorHandler)
 
 app.listen(PORT, () => {
   logger.info(`Example app listening at http://localhost:${PORT}`)
+  logger.info("For the UI, open http://localhost:8000/admin/queues")
+  logger.info("Make sure Redis is running on port 6379 by default")
 })

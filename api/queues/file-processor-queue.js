@@ -1,6 +1,6 @@
 import { Queue } from "bullmq"
-import { REDIS_QUEUE_HOST, REDIS_QUEUE_PORT } from "./config/config.js"
-import { setUpWorker } from "./worker.js"
+import { REDIS_QUEUE_HOST, REDIS_QUEUE_PORT } from "../config/config.js"
+import { setUpWorker } from "../worker.js"
 
 const DEFAULT_REMOVE_CONFIG = {
   removeOnComplete: {

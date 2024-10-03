@@ -1,6 +1,7 @@
 import path from "path"
 import { exec } from "child_process"
 import logger from "../utils/logger.js"
+import { LOGO_PATH } from "../config/config.js"
 
 export const processFile = async (
   fileName,

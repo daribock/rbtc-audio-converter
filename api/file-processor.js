@@ -3,7 +3,6 @@ import { processFile } from "./services/file-service.js"
 
 export default async function jobProcessor(job) {
   const { jobId, fileName, filePath, totalFiles, fileNumber } = job.data
-  const updateProgress = (100 / totalFiles) * fileNumber
 
   await job.log(`Started processing job with id ${job.id}`)
   logger.info(`Job with id ${job.id}`, job.data)
@@ -12,6 +11,6 @@ export default async function jobProcessor(job) {
   logger.info(`Processing file ${fileName}`)
   // await processFile()
 
-  await job.updateProgress(updateProgress)
+  await job.updateProgress(100)
   return "DONE"
 }
