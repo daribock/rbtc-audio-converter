@@ -4,4 +4,4 @@ services:
   redis:
     command: redis-server /usr/local/etc/redis/redis.dev.conf
     volumes:
-      - ./config:/usr/local/etc/redis/ # Configuration stored in the 'config' folder
+      - ./config/redis.dev.conf:/usr/local/etc/redis/redis.dev.conf # Configuration stored in the 'config' folder

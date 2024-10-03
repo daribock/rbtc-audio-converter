@@ -4,6 +4,8 @@ import helmet from "helmet"
 import fs from "fs"
 import logger from "./utils/logger.js"
 import errorHandler from "./middlewares/error-handler.js"
+import { addJobToFileProcessorQueue } from "./queue.js"
+import { getAllFilesInDir } from "./utils/file-utils.js"
 
 const PORT = process.env.PORT || 8000
 const app = express()
@@ -215,6 +217,49 @@ app.post("/upload/complete", (req, res, next) => {
 
   logger.info(`File upload process completed for ${uploadId}`)
   return res.status(201).send({ status: "SUCCESSFULLY_UPLOADED" })
+})
+
+app.post("/files/process", async (req, res, next) => {
+  const uniqueJobId = String(req.headers["x-job-id"])
+
+  if (!uniqueJobId) {
+    const error = new Error("No x-job-id header found")
+    error.status = 400
+    return next(error)
+  }
+
+  const filesDir = dest + `${uniqueJobId}`
+
+  await getAllFilesInDir(filesDir)
+    .then(async (files) => {
+      for (const file of files) {
+        const data = {
+          jobId: uniqueJobId,
+          fileName: file.or,
+          filePath: file.path,
+          totalFiles: files.length,
+          fileNumber: files.indexOf(file) + 1,
+        }
+
+        try {
+          await addJobToFileProcessorQueue(data)
+        } catch (err) {
+          const error = new Error(
+            `Failed to add job to file processor queue: ${uniqueJobId}`,
+          )
+          error.status = 400
+          return next(error)
+        }
+      }
+
+      res.status(200).send({ status: "FILE_PROCESS_STARTED" })
+      return next()
+    })
+    .catch(() => {
+      const error = new Error(`No files uploaded for the job: ${uniqueJobId}`)
+      error.status = 400
+      return next(error)
+    })
 })
 
 app.use(errorHandler)

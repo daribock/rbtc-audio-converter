@@ -1,15 +1,72 @@
 import archiver from "archiver"
 import fs from "fs"
+import path from "path"
+import logger from "./logger.js"
 
 export const zipFiles = async (directory) => {
   const output = fs.createWriteStream(`${directory}.zip`)
   const archive = archiver("zip", { zlib: { level: 9 } })
 
   output.on("close", () => {
-    console.log(`Archive created: ${archive.pointer()} total bytes`)
+    logger.info(`Archive created: ${archive.pointer()} total bytes`)
   })
 
   archive.pipe(output)
   archive.directory(directory, false)
   await archive.finalize()
+}
+
+/**
+ * Get all files in a directory
+ * @param {string} dirPath - Path to the directory
+ * @returns {Promise<Array>} - Promise resolving to an array of file objects with name and path
+ */
+export async function getAllFilesInDir(dirPath) {
+  const filesArray = []
+
+  try {
+    // Read the contents of the directory
+    const files = await fs.promises.readdir(dirPath)
+
+    for (const file of files) {
+      const filePath = path.join(dirPath, file)
+      try {
+        const stat = await fs.promises.stat(filePath)
+        if (stat.isFile()) {
+          filesArray.push({
+            name: file,
+            path: filePath,
+          })
+        }
+      } catch (err) {
+        // Log the error and stop further processing
+        logger.error(
+          `Error retrieving stats for file: ${filePath}`,
+          err.message,
+        )
+        throw new Error(`Failed to retrieve file stats for: ${filePath}`)
+      }
+    }
+  } catch (err) {
+    // Log the error and stop further processing
+    logger.error(`Error reading directory: ${dirPath}`, err.message)
+    throw new Error(`Failed to read directory: ${dirPath}`)
+  }
+
+  return filesArray // Return the array of file objects if no errors occurred
+}
+
+export const cleanupDirectories = async (directories) => {
+  try {
+    await Promise.all(
+      directories.map(async (dir) => {
+        if (fs.existsSync(dir)) {
+          await fs.promises.rm(dir, { recursive: true, force: true })
+        }
+      }),
+    )
+    logger.info("Cleanup successful")
+  } catch (error) {
+    logger.error("Error during cleanup:", error)
+  }
 }
