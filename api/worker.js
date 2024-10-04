@@ -14,8 +14,8 @@ const zipFolderProcessor = path.join(
   "processors/zip-folder-processor.js",
 )
 
-export const fileProcessorWorker = () => {
-  const worker = new Worker("fileProcessorQueue", fileProcessorPath, {
+const createWorker = (queueName, processorPath) => {
+  const worker = new Worker(queueName, processorPath, {
     connection: {
       host: REDIS_QUEUE_HOST,
       port: REDIS_QUEUE_PORT,
@@ -24,36 +24,36 @@ export const fileProcessorWorker = () => {
   })
 
   worker.on("completed", (job) => {
-    logger.info(`Completed job with id ${job.id}`)
+    logger.info(
+      `Job with id ${job.id} in queue ${queueName} completed successfully`,
+    )
   })
 
   worker.on("active", (job) => {
-    logger.info(`Completed job with id ${job.id}`)
+    logger.info(`Job with id ${job.id} in queue ${queueName} is now active`)
   })
 
-  worker.on("error", (failedReason) => {
-    logger.error(`Job encountered an error`, failedReason)
+  worker.on("failed", (job, err) => {
+    logger.error(`Job with id ${job.id} in queue ${queueName} failed`, {
+      error: err.message,
+      stack: err.stack,
+    })
   })
+
+  worker.on("error", (err) => {
+    logger.error(`Worker error in queue ${queueName}`, {
+      error: err.message,
+      stack: err.stack,
+    })
+  })
+
+  return worker
+}
+
+export const fileProcessorWorker = () => {
+  return createWorker("fileProcessorQueue", fileProcessorPath)
 }
 
 export const createZipFolderWorker = () => {
-  const worker = new Worker("createZipFolderQueue", zipFolderProcessor, {
-    connection: {
-      host: REDIS_QUEUE_HOST,
-      port: REDIS_QUEUE_PORT,
-    },
-    autorun: true,
-  })
-
-  worker.on("completed", (job) => {
-    logger.info(`Completed zip folder creation job with id ${job.id}`)
-  })
-
-  worker.on("active", (job) => {
-    logger.info(`Completed zip folder creation job with id ${job.id}`)
-  })
-
-  worker.on("error", (failedReason) => {
-    logger.error(`Zip folder creation job encountered an error`, failedReason)
-  })
+  return createWorker("createZipFolderQueue", zipFolderProcessor)
 }
