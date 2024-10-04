@@ -4,6 +4,8 @@ import { fileURLToPath } from "url"
 import { REDIS_QUEUE_HOST, REDIS_QUEUE_PORT } from "./config/config.js"
 import logger from "./utils/logger.js"
 
+// TODO: On worker fail or error delete process folder or download folder
+
 // Define __filename and __dirname
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

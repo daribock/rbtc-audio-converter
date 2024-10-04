@@ -2,8 +2,20 @@ import archiver from "archiver"
 import fs from "fs"
 import path from "path"
 import { exec } from "child_process"
-import { LOGO_PATH } from "../config/config.js"
+import {
+  ROOT_PATH,
+  LOGO_PATH,
+  UPLOAD_DIR,
+  PROCESSED_DIR,
+} from "../config/config.js"
 import logger from "./logger.js"
+
+export const createDirectory = (path) => {
+  if (!fs.existsSync(path)) {
+    logger.warn(`Directory ${path} does not exist. Creating...`)
+    fs.mkdirSync(path, { recursive: true })
+  }
+}
 
 export const zipFiles = async (directory) => {
   const output = fs.createWriteStream(`${directory}.zip`)
@@ -58,11 +70,18 @@ export async function getAllFilesInDir(dirPath) {
   return filesArray // Return the array of file objects if no errors occurred
 }
 
+/**
+ * Process a single file in the queue
+ * TODO:
+ * - First convert file to mp3 then set progress of job to 50%
+ * - afterwards add metadata with eye3d and then when this is done update progress to 100%
+ * - Process file chunk by chunk to reduce load example: https://github.com/taskforcesh/bullmq-video-transcoder/tree/main
+ */
 export const processFile = async (
+  jobId,
   fileName,
   filePath,
   fileNumber,
-  processedDir,
   subject,
   city,
   teacher,
@@ -75,7 +94,17 @@ export const processFile = async (
     const day = monthDay.slice(2, 4)
     const trackIndex = String(fileNumber).padStart(2, "0")
     const newFilename = `${year}${month}${day} ${subject} ${trackIndex} ${city} ${teacher}.mp3`
-    const outputPath = path.join(processedDir, newFilename)
+
+    createDirectory(path.join(ROOT_PATH, UPLOAD_DIR, jobId, PROCESSED_DIR))
+    const outputPath = path.join(
+      ROOT_PATH,
+      UPLOAD_DIR,
+      jobId,
+      "processed",
+      newFilename,
+    )
+
+    console.log("processFile outputPath", outputPath, filePath)
 
     const command = `ffmpeg -i "${filePath}" -q:a 0 -map a "${outputPath}" && eyeD3 --add-image="${LOGO_PATH}":FRONT_COVER --artist="${teacher}" --title="${newFilename}" --album="${subject}" --track="1" --to-v2.4 "${outputPath}"`
 

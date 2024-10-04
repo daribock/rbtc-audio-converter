@@ -2,15 +2,9 @@ import express from "express"
 import fs from "fs"
 import logger from "../utils/logger.js"
 import { UPLOAD_DIR } from "../config/config.js"
+import { createDirectory } from "../utils/file-utils.js"
 
 const router = express.Router()
-
-const destinationExists = (path) => {
-  if (!fs.existsSync(path)) {
-    logger.warn(`Directory ${path} does not exist. Creating...`)
-    fs.mkdirSync(path, { recursive: true })
-  }
-}
 
 const validateHeaders = (req, res, next, requiredHeaders) => {
   for (const header of requiredHeaders) {
@@ -38,7 +32,7 @@ router.get("/upload/status", (req, res, next) => {
   const uploadId = uniqueJobId + "_" + uniqueFileId
   const fileSize = parseInt(req.headers["file-size"], 10)
 
-  destinationExists(UPLOAD_DIR)
+  createDirectory(UPLOAD_DIR)
 
   const jobDir = `${UPLOAD_DIR}${uniqueJobId}/`
   const filePath = jobDir + uniqueFileId
@@ -104,7 +98,7 @@ router.post("/upload/files", (req, res, next) => {
   const fileSize = parseInt(req.headers["file-size"], 10)
 
   const jobDir = `${UPLOAD_DIR}${uniqueJobId}`
-  destinationExists(jobDir)
+  createDirectory(jobDir)
 
   if (uploads[uploadId] && fileSize === uploads[uploadId].bytesReceived) {
     return logAndRespond(
@@ -154,7 +148,7 @@ router.post("/upload/files", (req, res, next) => {
   })
 })
 
-router.post("/upload/complete", (req, res, next) => {
+router.get("/upload/complete", (req, res, next) => {
   const headersToValidate = ["x-file-name", "x-job-id"]
   validateHeaders(req, res, next, headersToValidate)
 

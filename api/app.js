@@ -10,10 +10,16 @@ import { ExpressAdapter } from "@bull-board/express"
 import { createBullBoard } from "@bull-board/api"
 import uploadRoutes from "./routes/upload-routes.js"
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter.js"
-import { DEFAULT_JOB_REMOVE_CONFIG, UPLOAD_DIR } from "./config/config.js"
+import {
+  DEFAULT_JOB_REMOVE_CONFIG,
+  UPLOAD_DIR,
+  ROOT_PATH,
+} from "./config/config.js"
 import { createZipFolderQueue } from "./queues/create-zip-folder-queue.js"
 
 const PORT = process.env.PORT || 8000
+
+console.log(ROOT_PATH)
 
 const flowProducer = new FlowProducer()
 
@@ -40,16 +46,19 @@ app.use("/admin/queues", serverAdapter.getRouter())
 app.use("/", uploadRoutes)
 
 app.post("/convert/files", async (req, res, next) => {
-  const uniqueJobId = req.headers["x-job-id"]
+  const { jobId, subject, email, city, teacher } = req.body
 
-  if (!uniqueJobId) {
-    const error = new Error("No x-job-id header found")
+  console.log(req)
+
+  if (!jobId || !subject || !email || !city || !teacher) {
+    const error = new Error("Missing required fields in body")
     error.status = 400
     return next(error)
   }
 
-  const filesDir = UPLOAD_DIR + `${uniqueJobId}`
+  const filesDir = UPLOAD_DIR + `${jobId}`
 
+  // TODO: Add one additional que to send email to the user
   await getAllFilesInDir(filesDir)
     .then(async (files) => {
       try {
@@ -57,12 +66,16 @@ app.post("/convert/files", async (req, res, next) => {
         await flowProducer.add({
           name: "create-zip-folder",
           queueName: "createZipFolderQueue",
+          data: { email, jobId },
           children: files.map((file) => {
             return {
               name: "processFile",
               queueName: "fileProcessorQueue",
               data: {
-                jobId: uniqueJobId,
+                subject,
+                city,
+                teacher,
+                jobId: jobId,
                 fileName: file.name,
                 filePath: file.path,
                 totalFiles: files.length,
@@ -73,9 +86,7 @@ app.post("/convert/files", async (req, res, next) => {
           }),
         })
       } catch (err) {
-        const error = new Error(
-          `Failed to add job to file processor queue: ${uniqueJobId}`,
-        )
+        const error = new Error(`Failed to convert files for the job: ${jobId}`)
         error.status = 400
         return next(error)
       }
@@ -84,7 +95,7 @@ app.post("/convert/files", async (req, res, next) => {
       return next()
     })
     .catch(() => {
-      const error = new Error(`No files uploaded for the job: ${uniqueJobId}`)
+      const error = new Error(`No files uploaded for the job: ${jobId}`)
       error.status = 400
       return next(error)
     })
