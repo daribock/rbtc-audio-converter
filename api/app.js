@@ -106,5 +106,5 @@ app.use(errorHandler)
 app.listen(PORT, () => {
   logger.info(`Example app listening at http://localhost:${PORT}`)
   logger.info("For the UI, open http://localhost:8000/admin/queues")
-  logger.info("Make sure Redis is running on port 6379 by default")
+  logger.info("Make sure Redis is running on port 6479 by default")
 })
