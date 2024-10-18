@@ -7,6 +7,7 @@ import {
   LOGO_PATH,
   UPLOAD_DIR,
   PROCESSED_DIR,
+  DOWNLOAD_DIR,
 } from "../config/config.js"
 import logger from "./logger.js"
 
@@ -17,8 +18,11 @@ export const createDirectory = (path) => {
   }
 }
 
-export const zipFiles = async (directory) => {
-  const output = fs.createWriteStream(`${directory}.zip`)
+export const zipFiles = async (directory, jobId) => {
+  const downloadDir = path.join(ROOT_PATH, UPLOAD_DIR, jobId, DOWNLOAD_DIR)
+  createDirectory(downloadDir)
+  const zipFilePath = path.join(downloadDir, `converted_files_${jobId}.zip`)
+  const output = fs.createWriteStream(zipFilePath)
   const archive = archiver("zip", { zlib: { level: 9 } })
 
   output.on("close", () => {
@@ -100,7 +104,7 @@ export const processFile = async (
       ROOT_PATH,
       UPLOAD_DIR,
       jobId,
-      "processed",
+      PROCESSED_DIR,
       newFilename,
     )
 

@@ -9,7 +9,7 @@ export const ROOT_PATH = path.join(__dirname, "../..")
 export const REDIS_QUEUE_HOST = process.env.REDIS_QUEUE_HOST || "0.0.0.0"
 export const REDIS_QUEUE_PORT = process.env.REDIS_QUEUE_PORT
   ? parseInt(process.env.REDIS_QUEUE_PORT)
-  : 6479
+  : 6379
 
 // Define the logo path
 export const LOGO_PATH = path.join(__dirname, "../assets/logo.jpg")
