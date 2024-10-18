@@ -19,8 +19,6 @@ import { createZipFolderQueue } from "./queues/create-zip-folder-queue.js"
 
 const PORT = process.env.PORT || 8000
 
-console.log(ROOT_PATH)
-
 const flowProducer = new FlowProducer()
 
 const serverAdapter = new ExpressAdapter()

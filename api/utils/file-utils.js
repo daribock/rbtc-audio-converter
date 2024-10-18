@@ -106,7 +106,7 @@ export const processFile = async (
 
     console.log("processFile outputPath", outputPath, filePath)
 
-    const command = `ffmpeg -i "${filePath}" -q:a 0 -map a "${outputPath}" && eyeD3 --add-image="${LOGO_PATH}":FRONT_COVER --artist="${teacher}" --title="${newFilename}" --album="${subject}" --track="1" --to-v2.4 "${outputPath}"`
+    const command = `ffmpeg -i "${filePath}" -q:a 0 -map a "${outputPath}" && eyeD3 --add-image="${LOGO_PATH}":FRONT_COVER --artist="${teacher}" --title="${newFilename}" --album="${subject}" --track="${trackIndex}" --to-v2.4 "${outputPath}"`
 
     logger.info(`Processing file: ${fileName}`)
     await new Promise((resolve, reject) => {
