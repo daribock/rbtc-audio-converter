@@ -11,6 +11,29 @@ import {
 } from "../config/config.js"
 import logger from "./logger.js"
 
+export const getZipFileName = (jobId) => {
+  return `converted_files_${jobId}.zip`
+}
+
+export const checkFoldersExistAsync = async (jobId) => {
+  const processedPath = path.join(ROOT_PATH, UPLOAD_DIR, jobId, PROCESSED_DIR)
+  const downloadsPath = path.join(ROOT_PATH, UPLOAD_DIR, jobId, DOWNLOAD_DIR)
+
+  const processedExists = await fs.promises
+    .access(processedPath)
+    .then(() => true)
+    .catch(() => false)
+  const downloadsExists = await fs.promises
+    .access(downloadsPath)
+    .then(() => true)
+    .catch(() => false)
+
+  return {
+    processedExists,
+    downloadsExists,
+  }
+}
+
 export const createDirectory = (path) => {
   if (!fs.existsSync(path)) {
     logger.warn(`Directory ${path} does not exist. Creating...`)
@@ -21,7 +44,7 @@ export const createDirectory = (path) => {
 export const zipFiles = async (directory, jobId) => {
   const downloadDir = path.join(ROOT_PATH, UPLOAD_DIR, jobId, DOWNLOAD_DIR)
   createDirectory(downloadDir)
-  const zipFilePath = path.join(downloadDir, `converted_files_${jobId}.zip`)
+  const zipFilePath = path.join(downloadDir, getZipFileName(jobId))
   const output = fs.createWriteStream(zipFilePath)
   const archive = archiver("zip", { zlib: { level: 9 } })
 

@@ -1,3 +1,4 @@
+import "dotenv/config"
 import cors from "cors"
 import express from "express"
 import helmet from "helmet"
@@ -5,9 +6,10 @@ import logger from "./utils/logger.js"
 import errorHandler from "./middlewares/error-handler.js"
 import { fileProcessorQueue } from "./queues/file-processor-queue.js"
 import { FlowProducer } from "bullmq"
-import { getAllFilesInDir } from "./utils/file-utils.js"
+import { checkFoldersExistAsync, getAllFilesInDir } from "./utils/file-utils.js"
 import { ExpressAdapter } from "@bull-board/express"
 import { createBullBoard } from "@bull-board/api"
+import downloadRoutes from "./routes/download-routes.js"
 import uploadRoutes from "./routes/upload-routes.js"
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter.js"
 import { DEFAULT_JOB_REMOVE_CONFIG, UPLOAD_DIR } from "./config/config.js"
@@ -39,6 +41,7 @@ app.use(helmet())
 
 // Initialize Routes
 app.use("/admin/queues", serverAdapter.getRouter())
+app.use("/", downloadRoutes)
 app.use("/", uploadRoutes)
 
 app.post("/convert/files", async (req, res, next) => {
@@ -47,6 +50,23 @@ app.post("/convert/files", async (req, res, next) => {
   if (!jobId || !subject || !email || !city || !teacher) {
     const error = new Error("Missing required fields in body")
     error.status = 400
+    return next(error)
+  }
+
+  try {
+    const convertFoldersExist = await checkFoldersExistAsync(jobId)
+
+    if (
+      convertFoldersExist.downloadsExists ||
+      convertFoldersExist.processedExists
+    ) {
+      const error = new Error(`Files for this job have already been converted`)
+      error.status = 423
+      return next(error)
+    }
+  } catch (err) {
+    const error = new Error(`Something went wrong: ${err}`)
+    error.status = 500
     return next(error)
   }
 
@@ -90,13 +110,13 @@ app.post("/convert/files", async (req, res, next) => {
           {
             queuesOptions: {
               sendEmailQueue: {
-                ...DEFAULT_JOB_REMOVE_CONFIG,
+                defaultJobOptions: { ...DEFAULT_JOB_REMOVE_CONFIG },
               },
               createZipFolderQueue: {
-                ...DEFAULT_JOB_REMOVE_CONFIG,
+                defaultJobOptions: { ...DEFAULT_JOB_REMOVE_CONFIG },
               },
               fileProcessorQueue: {
-                ...DEFAULT_JOB_REMOVE_CONFIG,
+                defaultJobOptions: { ...DEFAULT_JOB_REMOVE_CONFIG },
               },
             },
           },
