@@ -12,6 +12,7 @@ import uploadRoutes from "./routes/upload-routes.js"
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter.js"
 import { DEFAULT_JOB_REMOVE_CONFIG, UPLOAD_DIR } from "./config/config.js"
 import { createZipFolderQueue } from "./queues/create-zip-folder-queue.js"
+import { sendEmailQueue } from "./queues/send-email-queue.js"
 
 const PORT = process.env.PORT || 8000
 
@@ -22,6 +23,7 @@ createBullBoard({
   queues: [
     new BullMQAdapter(fileProcessorQueue),
     new BullMQAdapter(createZipFolderQueue),
+    new BullMQAdapter(sendEmailQueue),
   ],
   serverAdapter: serverAdapter,
 })
@@ -55,29 +57,50 @@ app.post("/convert/files", async (req, res, next) => {
     .then(async (files) => {
       try {
         logger.info("Creating flow")
-        await flowProducer.add({
-          name: "create-zip-folder",
-          queueName: "createZipFolderQueue",
-          data: { jobId },
-          children: files.map((file) => {
-            return {
-              name: "processFile",
-              queueName: "fileProcessorQueue",
-              data: {
-                subject,
-                city,
-                teacher,
-                jobId: jobId,
-                fileName: file.name,
-                filePath: file.path,
-                totalFiles: files.length,
-                fileNumber: files.indexOf(file) + 1,
+
+        await flowProducer.add(
+          {
+            name: `send-email-${jobId}`,
+            queueName: "sendEmailQueue",
+            data: { jobId, email },
+            children: [
+              {
+                name: `create-zip-folder-${jobId}`,
+                queueName: "createZipFolderQueue",
+                data: { jobId },
+                children: files.map((file) => {
+                  return {
+                    name: `process-file-${jobId}`,
+                    queueName: "fileProcessorQueue",
+                    data: {
+                      subject,
+                      city,
+                      teacher,
+                      jobId: jobId,
+                      fileName: file.name,
+                      filePath: file.path,
+                      totalFiles: files.length,
+                      fileNumber: files.indexOf(file) + 1,
+                    },
+                  }
+                }),
               },
-              ...DEFAULT_JOB_REMOVE_CONFIG,
-            }
-          }),
-          ...DEFAULT_JOB_REMOVE_CONFIG,
-        })
+            ],
+          },
+          {
+            queuesOptions: {
+              sendEmailQueue: {
+                ...DEFAULT_JOB_REMOVE_CONFIG,
+              },
+              createZipFolderQueue: {
+                ...DEFAULT_JOB_REMOVE_CONFIG,
+              },
+              fileProcessorQueue: {
+                ...DEFAULT_JOB_REMOVE_CONFIG,
+              },
+            },
+          },
+        )
       } catch (err) {
         logger.error(err)
         const error = new Error(`Failed to convert files for the job: ${jobId}`)

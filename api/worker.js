@@ -15,6 +15,10 @@ const zipFolderProcessor = path.join(
   __dirname,
   "processors/zip-folder-processor.js",
 )
+const sendEmailProcessor = path.join(
+  __dirname,
+  "processors/send-email-processor.js",
+)
 
 const createWorker = (queueName, processorPath) => {
   const worker = new Worker(queueName, processorPath, {
@@ -58,4 +62,8 @@ export const fileProcessorWorker = () => {
 
 export const createZipFolderWorker = () => {
   return createWorker("createZipFolderQueue", zipFolderProcessor)
+}
+
+export const sendEmailWorker = () => {
+  return createWorker("sendEmailQueue", sendEmailProcessor)
 }
