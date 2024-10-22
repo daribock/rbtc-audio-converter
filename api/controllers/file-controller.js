@@ -1,7 +1,8 @@
 import { ROOT_PATH, UPLOAD_DIR, DOWNLOAD_DIR } from "../config/config.js"
+import logger from "../utils/logger.js"
 import path from "path"
 
-const getDownloadLink = (req, res) => {
+const getDownloadLink = (req, res, next) => {
   // Extracting the file name from the request URL
   const fileName = req.params.fileName
   const jobId = req.params.jobId
@@ -15,7 +16,10 @@ const getDownloadLink = (req, res) => {
 
   res.download(filePath, (err) => {
     if (err) {
-      res.status(500).send({ message: "Error downloading file" })
+      logger.error(err)
+      const error = new Error(`Error downloading file`)
+      error.status = 500
+      return next(error)
     }
   })
 }

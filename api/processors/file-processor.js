@@ -1,6 +1,6 @@
 import path from "path"
 import logger from "../utils/logger.js"
-import { processFile } from "../utils/file-utils.js"
+import { processFile, checkFoldersExistAsync } from "../utils/file-utils.js"
 import { ROOT_PATH } from "../config/config.js"
 
 export default async function fileProcessor(job) {
@@ -15,8 +15,24 @@ export default async function fileProcessor(job) {
     teacher,
   } = job.data
 
-  await job.log(`Started processing job with id ${job.id}`)
-  logger.info(`Started processing job with id ${job.id}`, job.data)
+  job.log(`Started processing job with id ${job.id}`)
+  logger.info(`Started processing job with id ${job.id}`)
+
+  try {
+    const convertFoldersExist = await checkFoldersExistAsync(jobId)
+
+    if (convertFoldersExist.processedExists) {
+      job.log(`Files for ${jobId} have already been converted`)
+      logger.info(`Files for ${jobId} have already been converted`)
+      job.moveToFailed()
+    }
+  } catch (err) {
+    job.log(`Failed to check if files for ${jobId} have already been converted`)
+    logger.info(
+      `Failed to check if files for ${jobId} have already been converted`,
+    )
+    job.moveToFailed()
+  }
 
   const globalFilePath = path.join(ROOT_PATH, filePath)
 
@@ -33,6 +49,6 @@ export default async function fileProcessor(job) {
   )
 
   job.log(`Processing DONE`)
-  await job.updateProgress(100)
+  job.updateProgress(100)
   return "DONE"
 }

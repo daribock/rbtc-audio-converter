@@ -11,7 +11,6 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-// TODO: add downloadlink to html or text
 const sendEmail = async (recipient, jobId) => {
   const BASE_URL = process.env.BASE_URL
   const downloadLink = `${BASE_URL}/download/${jobId}/${getZipFileName(jobId)}`
@@ -32,9 +31,9 @@ const sendEmail = async (recipient, jobId) => {
 
   await transporter
     .sendMail({
-      from: "RBTC Audio Converter <no-reply@rbtc-audio-converter.darikletter.de>", // sender address
-      to: recipient, // list of receivers
-      subject: "RBTC converted audios", // Subject line
+      from: "RBTC Audio Converter <no-reply@rbtc-audio-converter.darikletter.de>",
+      to: recipient,
+      subject: "RBTC converted audios",
       html: emailBody,
     })
     .then(() => {
