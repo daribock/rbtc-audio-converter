@@ -4,8 +4,6 @@ import { fileURLToPath } from "url"
 import { REDIS_QUEUE_HOST, REDIS_QUEUE_PORT } from "./config/config.js"
 import logger from "./utils/logger.js"
 
-// TODO: On worker fail or error delete process folder or download folder
-
 // Define __filename and __dirname
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -19,6 +17,7 @@ const sendEmailProcessor = path.join(
   __dirname,
   "processors/send-email-processor.js",
 )
+const cleanupProcessor = path.join(__dirname, "processors/cleanup-processor.js")
 
 const createWorker = (queueName, processorPath) => {
   const worker = new Worker(queueName, processorPath, {
@@ -66,4 +65,8 @@ export const createZipFolderWorker = () => {
 
 export const sendEmailWorker = () => {
   return createWorker("sendEmailQueue", sendEmailProcessor)
+}
+
+export const cleanupWorker = () => {
+  return createWorker("cleanupQueue", cleanupProcessor)
 }

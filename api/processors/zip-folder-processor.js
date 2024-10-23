@@ -11,6 +11,7 @@ export default async function zipFolderProcessor(job) {
   job.log(`Started processing job with id ${job.id}`)
   logger.info(`Job with id ${job.id}`, job.data)
 
+  // Check if files have not been converted yet and if the zip file has already been created
   try {
     const convertFoldersExist = await checkFoldersExistAsync(jobId)
 

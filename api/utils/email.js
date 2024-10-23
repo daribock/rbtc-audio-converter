@@ -5,6 +5,7 @@ import { getZipFileName } from "./file-utils.js"
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_SERVER,
   port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -18,12 +19,12 @@ const sendEmail = async (recipient, jobId) => {
         <div style="width: 100%; background-color: #f4f4f4; padding: 20px;">
             <div style="background-color: #ffffff; max-width: 600px; margin: 40px auto; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <h2 style="color: #333;">Hello,</h2>
-                <p style="color: #555; font-size: 16px;">Your file is ready for download. Click the button below to get it:</p>
-                <a href="${downloadLink}" style="display: inline-block; background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; margin-top: 20px;">Download File</a>
-                <p style="color: #555; font-size: 16px;">If you have any questions, feel free to reach out to us.</p>
+                <p style="color: #555; font-size: 16px;">Your converted audio files are ready for download. Click the button below to get them:</p>
+                <a href="${downloadLink}" style="display: inline-block; background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; margin-top: 20px;">Download audio files</a>
+                <p style="color: #555; font-size: 16px;">If you have any questions, feel free to reach out to info@darikletter.de.</p>
                 <div style="margin-top: 40px; font-size: 12px; color: #777; text-align: center;">
-                    <p>Thank you for using our service!</p>
-                    <p>&copy; 2024 Your Company. All rights reserved.</p>
+                    <p>Enjoy and be blessed!</p>
+                    <p>&copy; 2024 darikletter</p>
                 </div>
             </div>
         </div>

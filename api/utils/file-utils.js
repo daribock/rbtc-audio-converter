@@ -15,9 +15,18 @@ export const getZipFileName = (jobId) => {
   return `converted_files_${jobId}.zip`
 }
 
-export const checkFoldersExistAsync = async (jobId) => {
+export const getFoldersByJobId = (jobId) => {
   const processedPath = path.join(ROOT_PATH, UPLOAD_DIR, jobId, PROCESSED_DIR)
   const downloadsPath = path.join(ROOT_PATH, UPLOAD_DIR, jobId, DOWNLOAD_DIR)
+
+  return {
+    processedPath,
+    downloadsPath,
+  }
+}
+
+export const checkFoldersExistAsync = async (jobId) => {
+  const { processedPath, downloadsPath } = getFoldersByJobId(jobId)
 
   const processedExists = await fs.promises
     .access(processedPath)
@@ -130,8 +139,6 @@ export const processFile = async (
       PROCESSED_DIR,
       newFilename,
     )
-
-    console.log("processFile outputPath", outputPath, filePath)
 
     const command = `ffmpeg -i "${filePath}" -q:a 0 -map a "${outputPath}" && eyeD3 --add-image="${LOGO_PATH}":FRONT_COVER --artist="${teacher}" --title="${newFilename}" --album="${subject}" --track="${trackIndex}" --to-v2.4 "${outputPath}"`
 

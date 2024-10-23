@@ -40,38 +40,49 @@ router.post("/convert/files", async (req, res, next) => {
 
   const filesDir = UPLOAD_DIR + `${jobId}`
 
-  // TODO: Add one additional que to send email to the user
   await getAllFilesInDir(filesDir)
     .then(async (files) => {
       try {
-        logger.info("Creating flow")
+        logger.info(`Creating flow for ${jobId}`)
+        const threeDayDelay = 3 * 24 * 60 * 60 * 1000 // 3 days
 
         await flowProducer.add(
           {
-            name: `send-email-${jobId}`,
-            queueName: "sendEmailQueue",
-            data: { jobId, email },
+            name: `cleanup-${jobId}`,
+            queueName: "cleanupQueue",
+            data: { jobId },
+            opts: { delay: threeDayDelay },
             children: [
               {
-                name: `create-zip-folder-${jobId}`,
-                queueName: "createZipFolderQueue",
-                data: { jobId },
-                children: files.map((file) => {
-                  return {
-                    name: `process-file-${jobId}`,
-                    queueName: "fileProcessorQueue",
-                    data: {
-                      subject,
-                      city,
-                      teacher,
-                      jobId: jobId,
-                      fileName: file.name,
-                      filePath: file.path,
-                      totalFiles: files.length,
-                      fileNumber: files.indexOf(file) + 1,
-                    },
-                  }
-                }),
+                name: `send-email-${jobId}`,
+                queueName: "sendEmailQueue",
+                data: { jobId, email },
+                opts: { ignoreDependencyOnFailure: true },
+                children: [
+                  {
+                    name: `create-zip-folder-${jobId}`,
+                    queueName: "createZipFolderQueue",
+                    data: { jobId },
+                    opts: { failParentOnFailure: true },
+                    children: files.map((file) => {
+                      return {
+                        name: `process-file-${jobId}`,
+                        queueName: "fileProcessorQueue",
+                        data: {
+                          subject,
+                          city,
+                          teacher,
+                          jobId: jobId,
+                          fileName: file.name,
+                          filePath: file.path,
+                          totalFiles: files.length,
+                          fileNumber: files.indexOf(file) + 1,
+                        },
+                        opts: { failParentOnFailure: true },
+                      }
+                    }),
+                  },
+                ],
               },
             ],
           },
@@ -84,6 +95,9 @@ router.post("/convert/files", async (req, res, next) => {
                 defaultJobOptions: { ...DEFAULT_JOB_REMOVE_CONFIG },
               },
               fileProcessorQueue: {
+                defaultJobOptions: { ...DEFAULT_JOB_REMOVE_CONFIG },
+              },
+              cleanupQueue: {
                 defaultJobOptions: { ...DEFAULT_JOB_REMOVE_CONFIG },
               },
             },

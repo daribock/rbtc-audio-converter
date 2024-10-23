@@ -37,7 +37,7 @@ export default async function fileProcessor(job) {
   const globalFilePath = path.join(ROOT_PATH, filePath)
 
   job.log(`Processing file ${fileName} from ${fileNumber}/${totalFiles}`)
-  // TODO: Build in step by step logging
+  logger.info(`Processing file ${fileName} from ${fileNumber}/${totalFiles}`)
   await processFile(
     jobId,
     fileName,
