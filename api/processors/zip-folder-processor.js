@@ -8,37 +8,53 @@ export default async function zipFolderProcessor(job) {
 
   const processedDir = path.join(ROOT_PATH, UPLOAD_DIR, jobId, PROCESSED_DIR)
 
-  job.log(`Started processing job with id ${job.id}`)
-  logger.info(`Job with id ${job.id}`, job.data)
+  job.log(`Started processing create zip folder job with id ${job.id}`)
+  logger.info(`Started processing create zip folder job with id ${job.id}`)
 
   // Check if files have not been converted yet and if the zip file has already been created
   try {
     const convertFoldersExist = await checkFoldersExistAsync(jobId)
 
     if (!convertFoldersExist.processedExists) {
-      job.log(`Files for ${jobId} have not been converted yet`)
-      logger.info(`Files for ${jobId} have not been converted yet`)
-      job.moveToFailed()
+      const error = new Error(
+        `Files for ${jobId} have not been converted yet``Files for ${jobId} have not been converted yet`,
+      )
+
+      job.log(error.message)
+      logger.error(error.message)
+      await job.moveToFailed(error, true)
     }
 
     if (convertFoldersExist.downloadsExists) {
-      job.log(`Zip file for ${jobId} has already been created`)
-      logger.info(`Zip file for ${jobId} has already been created`)
-      job.moveToFailed()
+      const error = new Error(`Zip file for ${jobId} has already been created`)
+
+      job.log(error)
+      logger.error(error)
+      await job.moveToFailed(error, true)
     }
   } catch (err) {
-    job.log(`Failed to check if Zip file for ${jobId} has already been created`)
-    logger.info(
-      `Failed to check if Zip file for ${jobId} has already been created`,
+    const error = new Error(
+      `Failed to check if zip file for ${jobId} has already been created`,
     )
-    job.moveToFailed()
+
+    job.log(error.message)
+    logger.error({
+      message: error.message,
+      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+    })
+    await job.moveToFailed(error, true)
   }
 
   job.log(`Creating zip folder for ${jobId}`)
   logger.info(`Creating zip folder for ${jobId}`)
   await zipFiles(processedDir, jobId)
 
-  job.log(`Processing DONE`)
+  job.log(
+    `Successfully Finished processing create zip folder job with id ${job.id}`,
+  )
+  logger.info(
+    `Successfully Finished processing create zip folder job with id ${job.id}`,
+  )
   job.updateProgress(100)
   return "DONE"
 }

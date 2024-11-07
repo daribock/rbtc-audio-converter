@@ -43,7 +43,7 @@ router.post("/convert/files", async (req, res, next) => {
   await getAllFilesInDir(filesDir)
     .then(async (files) => {
       try {
-        logger.info(`Creating flow for ${jobId}`)
+        logger.debug(`Creating flow for ${jobId}`)
         const threeDayDelay = 3 * 24 * 60 * 60 * 1000 // 3 days
 
         await flowProducer.add(
@@ -104,7 +104,6 @@ router.post("/convert/files", async (req, res, next) => {
           },
         )
       } catch (err) {
-        logger.error(err)
         const error = new Error(`Failed to convert files for the job: ${jobId}`)
         error.status = 400
         return next(error)

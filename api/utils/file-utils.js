@@ -58,7 +58,7 @@ export const zipFiles = async (directory, jobId) => {
   const archive = archiver("zip", { zlib: { level: 9 } })
 
   output.on("close", () => {
-    logger.info(`Archive created: ${archive.pointer()} total bytes`)
+    logger.debug(`Archive created: ${archive.pointer()} total bytes`)
   })
 
   archive.pipe(output)
@@ -90,16 +90,19 @@ export async function getAllFilesInDir(dirPath) {
         }
       } catch (err) {
         // Log the error and stop further processing
-        logger.error(
-          `Error retrieving stats for file: ${filePath}`,
-          err.message,
-        )
+        logger.error({
+          message: `Error retrieving stats for file: ${filePath}`,
+          stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+        })
         throw new Error(`Failed to retrieve file stats for: ${filePath}`)
       }
     }
   } catch (err) {
     // Log the error and stop further processing
-    logger.error(`Error reading directory: ${dirPath}`, err.message)
+    logger.error({
+      message: `Error reading directory: ${dirPath}`,
+      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+    })
     throw new Error(`Failed to read directory: ${dirPath}`)
   }
 
@@ -142,21 +145,28 @@ export const processFile = async (
 
     const command = `ffmpeg -i "${filePath}" -q:a 0 -map a "${outputPath}" && eyeD3 --add-image="${LOGO_PATH}":FRONT_COVER --artist="${teacher}" --title="${newFilename}" --album="${subject}" --track="${trackIndex}" --to-v2.4 "${outputPath}"`
 
-    logger.info(`Processing file: ${fileName}`)
+    logger.debug(`Processing file: ${fileName}`)
     await new Promise((resolve, reject) => {
-      exec(command, (error) => {
-        if (error) {
-          logger.error(`Error processing file ${fileName}: ${error}`)
-          reject(error)
+      exec(command, (err) => {
+        if (err) {
+          logger.error({
+            message: `Error processing file ${fileName}`,
+            stack:
+              process.env.NODE_ENV === "production" ? undefined : err.stack,
+          })
+          reject(err)
         } else {
-          logger.info(`Successfully processed file: ${fileName}`)
+          logger.debug(`Successfully processed file: ${fileName}`)
           resolve()
         }
       })
     })
-  } catch (error) {
-    logger.error("Error processing file:", fileName, error)
-    throw error
+  } catch (err) {
+    logger.error({
+      message: `Error processing file for ${jobId}`,
+      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+    })
+    throw err
   }
 }
 
@@ -169,8 +179,8 @@ export const cleanupDirectories = async (directories) => {
         }
       }),
     )
-    logger.info("Cleanup successful")
+    logger.debug("Cleanup successful")
   } catch (error) {
-    logger.error("Error during cleanup:", error)
+    logger.debug("Error during cleanup:", error)
   }
 }

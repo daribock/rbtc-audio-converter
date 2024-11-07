@@ -28,7 +28,8 @@ app.use("/", convertRoutes)
 app.use(errorHandler)
 
 app.listen(PORT, () => {
-  logger.info(`Example app listening at http://localhost:${PORT}`)
-  logger.info("For the UI, open http://localhost:8000/admin/queues")
-  logger.info("Make sure Redis is running on port 6379 by default")
+  logger.info("RBTC audio converter successfully started! 🚀")
+  logger.debug(`Api is listening at http://localhost:${PORT}`)
+  logger.debug("For the UI, open http://localhost:8000/admin/queues")
+  logger.debug("Make sure Redis is running on port 6379 by default")
 })

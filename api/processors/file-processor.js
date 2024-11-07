@@ -15,29 +15,41 @@ export default async function fileProcessor(job) {
     teacher,
   } = job.data
 
-  job.log(`Started processing job with id ${job.id}`)
-  logger.info(`Started processing job with id ${job.id}`)
+  job.log(`Started processing file processing job with id ${job.id}`)
+  logger.info(`Started processing file processing job with id ${job.id}`)
 
   try {
     const convertFoldersExist = await checkFoldersExistAsync(jobId)
 
     if (convertFoldersExist.processedExists) {
-      job.log(`Files for ${jobId} have already been converted`)
-      logger.info(`Files for ${jobId} have already been converted`)
-      job.moveToFailed()
+      const error = new Error(`Files for ${jobId} have already been processed`)
+
+      job.log(error.message)
+      logger.error(error.message)
+      await job.moveToFailed(error, "fileProcessorQueue")
     }
   } catch (err) {
-    job.log(`Failed to check if files for ${jobId} have already been converted`)
-    logger.info(
+    const error = new Error(
       `Failed to check if files for ${jobId} have already been converted`,
     )
-    job.moveToFailed()
+
+    job.log(error.message)
+    logger.error({
+      message: error.message,
+      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+    })
+    await job.moveToFailed(error, "fileProcessorQueue")
   }
 
   const globalFilePath = path.join(ROOT_PATH, filePath)
 
-  job.log(`Processing file ${fileName} from ${fileNumber}/${totalFiles}`)
-  logger.info(`Processing file ${fileName} from ${fileNumber}/${totalFiles}`)
+  // TODO: Build in step by step logging for processFile
+  job.log(
+    `Processing file ${fileName} from ${fileNumber}/${totalFiles} for ${jobId}`,
+  )
+  logger.info(
+    `Processing file ${fileName} from ${fileNumber}/${totalFiles} for ${jobId}`,
+  )
   await processFile(
     jobId,
     fileName,
@@ -48,7 +60,12 @@ export default async function fileProcessor(job) {
     teacher,
   )
 
-  job.log(`Processing DONE`)
+  job.log(
+    `Successfully finished processing file processing job with id ${job.id}`,
+  )
+  logger.info(
+    `Successfully finished processing file processing job with id ${job.id}`,
+  )
   job.updateProgress(100)
   return "DONE"
 }
