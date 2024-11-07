@@ -41,14 +41,14 @@ const createWorker = (queueName, processorPath) => {
   worker.on("failed", (job, err) => {
     logger.error(`Job with id ${job.id} in queue ${queueName} failed`, {
       error: err.message,
-      stack: err.stack,
+      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
     })
   })
 
   worker.on("error", (err) => {
     logger.error(`Worker error in queue ${queueName}`, {
       error: err.message,
-      stack: err.stack,
+      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
     })
   })
 

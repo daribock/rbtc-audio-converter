@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node api/app.js",
+    "start:production": "NODE_ENV=production node api/app.js",
     "dev": "nodemon api/app.js",
     "lint": "eslint 'api/**/*.js'",
     "format": "prettier --write 'api/**/*.{js,ts}'"

@@ -21,7 +21,7 @@ const sendEmail = async (recipient, jobId) => {
                 <h2 style="color: #333;">Hello,</h2>
                 <p style="color: #555; font-size: 16px;">Your converted audio files are ready for download. Click the button below to get them:</p>
                 <a href="${downloadLink}" style="display: inline-block; background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; margin-top: 20px;">Download audio files</a>
-                <p style="color: #555; font-size: 16px;">If you have any questions, feel free to reach out to info@darikletter.de.</p>
+                <p style="color: #555; font-size: 16px;">This link will expire after 3 days. Please download the files as soon as possible!</p>
                 <div style="margin-top: 40px; font-size: 12px; color: #777; text-align: center;">
                     <p>Enjoy and be blessed!</p>
                     <p>&copy; 2024 darikletter</p>

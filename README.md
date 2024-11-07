@@ -9,3 +9,5 @@ The backend for the RBTC Audio Converter.
 - [ ] Make download more secure with a authentication system
 - [ ] Build in step by step logging for processFile
 - [ ] Add authentication for admin route
+- [ ] Add a route to remove all jobs and delete the uploads folder with
+      authentication (flush)
