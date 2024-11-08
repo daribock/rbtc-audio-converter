@@ -40,14 +40,14 @@ export default async function sendEmailProcessor(job) {
 
   // Try to send email
   try {
-    await sendEmail(email, jobId)
+    await sendEmail([email], jobId)
   } catch (err) {
     const error = new Error(`Error sending email for ${jobId}`)
 
     job.log(error.message)
     logger.error({
       message: error.message,
-      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+      error: process.env.NODE_ENV === "production" ? undefined : err,
     })
     await job.moveToFailed(error, true)
   }
