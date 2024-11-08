@@ -1,7 +1,7 @@
 import { Worker } from "bullmq"
 import path from "path"
 import { fileURLToPath } from "url"
-import { REDIS_QUEUE_HOST, REDIS_QUEUE_PORT } from "./config/config.js"
+import { REDIS_CONNECTION_CONFIG } from "./config/config.js"
 import logger from "./utils/logger.js"
 
 // Define __filename and __dirname
@@ -21,10 +21,7 @@ const cleanupProcessor = path.join(__dirname, "processors/cleanup-processor.js")
 
 const createWorker = (queueName, processorPath) => {
   const worker = new Worker(queueName, processorPath, {
-    connection: {
-      host: REDIS_QUEUE_HOST,
-      port: REDIS_QUEUE_PORT,
-    },
+    connection: REDIS_CONNECTION_CONFIG,
     autorun: true,
   })
 

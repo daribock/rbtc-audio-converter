@@ -1,12 +1,9 @@
 import { Queue } from "bullmq"
-import { REDIS_QUEUE_HOST, REDIS_QUEUE_PORT } from "../config/config.js"
+import { REDIS_CONNECTION_CONFIG } from "../config/config.js"
 import { fileProcessorWorker } from "../worker.js"
 
 export const fileProcessorQueue = new Queue("fileProcessorQueue", {
-  connection: {
-    host: REDIS_QUEUE_HOST,
-    port: REDIS_QUEUE_PORT,
-  },
+  connection: REDIS_CONNECTION_CONFIG,
 })
 
 fileProcessorWorker()

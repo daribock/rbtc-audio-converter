@@ -6,10 +6,14 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 export const ROOT_PATH = path.join(__dirname, "../..")
 
-export const REDIS_QUEUE_HOST = process.env.REDIS_QUEUE_HOST || "0.0.0.0"
-export const REDIS_QUEUE_PORT = process.env.REDIS_QUEUE_PORT
-  ? parseInt(process.env.REDIS_QUEUE_PORT)
+export const REDIS_HOST = process.env.REDIS_HOST || "0.0.0.0"
+export const REDIS_PORT = process.env.REDIS_PORT
+  ? parseInt(process.env.REDIS_PORT)
   : 6379
+export const REDIS_CONNECTION_CONFIG = {
+  host: REDIS_HOST,
+  port: REDIS_PORT,
+}
 
 // Define the logo path
 export const LOGO_PATH = path.join(__dirname, "../assets/logo.jpg")

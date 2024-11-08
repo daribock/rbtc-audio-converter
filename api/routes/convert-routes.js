@@ -1,13 +1,17 @@
 import express from "express"
 import { FlowProducer } from "bullmq"
-import { DEFAULT_JOB_REMOVE_CONFIG, UPLOAD_DIR } from "./../config/config.js"
+import {
+  DEFAULT_JOB_REMOVE_CONFIG,
+  UPLOAD_DIR,
+  REDIS_CONNECTION_CONFIG,
+} from "./../config/config.js"
 import {
   checkFoldersExistAsync,
   getAllFilesInDir,
 } from "./../utils/file-utils.js"
 import logger from "./../utils/logger.js"
 
-const flowProducer = new FlowProducer()
+const flowProducer = new FlowProducer({ connection: REDIS_CONNECTION_CONFIG })
 
 const router = express.Router()
 

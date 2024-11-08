@@ -5,8 +5,9 @@ FROM node:21
 WORKDIR /usr/src/app
 
 # Install ffmpeg and eyeD3
-# RUN apt-get update && \
-#   apt-get install -y ffmpeg eyed3
+RUN apt-get update && \
+  apt-get install -y ffmpeg eyed3
+
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
@@ -14,10 +15,13 @@ COPY package*.json ./
 RUN npm install --omit=dev
 
 # Copy the rest of the application code
-COPY ./api .
+COPY ./api ./api
+
+# Copy env file
+COPY .env .
 
 # Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 8000
 
 # Run the app
-CMD ["node", "index.js"]
+CMD ["node", "./api/app.js"]
