@@ -13,6 +13,10 @@ export const REDIS_PORT = process.env.REDIS_PORT
 export const REDIS_CONNECTION_CONFIG = {
   host: REDIS_HOST,
   port: REDIS_PORT,
+  password:
+    process.env.NODE_ENV === "production"
+      ? process.env.REDIS_PASSWORD
+      : undefined,
 }
 
 // Define the logo path
