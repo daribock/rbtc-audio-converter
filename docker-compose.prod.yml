@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  redis:
+    restart: on-failure
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf # Configuration stored in the 'config' folder
+
+  node-api:
+    restart: on-failure
+    environment:
+      - NODE_ENV=production

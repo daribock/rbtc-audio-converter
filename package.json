@@ -1,30 +1,45 @@
 {
   "name": "rbtc-audio-convertor-backend",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "nodemon server/index.js"
+    "start": "node api/app.js",
+    "start:production": "NODE_ENV=production node api/app.js",
+    "dev": "nodemon api/app.js",
+    "lint": "eslint 'api/**/*.js'",
+    "format": "prettier --write 'api/**/*.{js,ts}'"
   },
   "author": "Darius Kletter <darikletter@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@bull-board/api": "^6.0.0",
+    "@bull-board/express": "^6.0.0",
     "archiver": "^7.0.1",
-    "express": "^4.19.2",
-    "express-fileupload": "^1.5.0",
-    "uuid": "^10.0.0",
+    "body-parser": "^1.20.3",
+    "bullmq": "^5.13.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "helmet": "^7.1.0",
+    "ioredis": "^5.4.1",
+    "mailgun.js": "^10.2.3",
+    "multer": "^1.4.5-lts.1",
+    "rate-limiter-flexible": "^5.0.3",
     "winston": "^3.14.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.2.2",
     "@commitlint/config-conventional": "^19.2.2",
-    "@eslint/js": "^9.8.0",
-    "eslint": "9.x",
-    "globals": "^15.8.0",
+    "@eslint/js": "^9.10.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.9.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.5",
-    "nodemon": "^3.1.4",
-    "prettier": "^3.2.5"
+    "nodemon": "^3.1.4"
   },
   "lint-staged": {
     "**/*": "prettier --config ./.prettierrc.json --write --ignore-unknown"

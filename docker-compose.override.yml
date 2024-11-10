@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  redis:
+    command: redis-server /usr/local/etc/redis/redis.dev.conf
+    volumes:
+      - ./config/redis.dev.conf:/usr/local/etc/redis/redis.dev.conf # Configuration stored in the 'config' folder
+
+  node-api:
+    environment:
+      - NODE_ENV=development # Override to development
+
