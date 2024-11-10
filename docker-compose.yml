@@ -4,7 +4,7 @@ services:
   redis:
     image: "redis:alpine"
     ports:
-      - "6379:6379"
+      - "6380:6380"
     volumes:
       - ./data:/var/lib/redis # Persist data
     environment:
@@ -25,7 +25,7 @@ services:
       - "8000:8000"
     environment:
       - REDIS_HOST=redis # Reference Redis service by name
-      - REDIS_PORT=6379
+      - REDIS_PORT=6380
     volumes:
       - ./logs:/usr/src/app/logs
     depends_on:
