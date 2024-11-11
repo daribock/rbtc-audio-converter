@@ -2,7 +2,7 @@
 
 The backend for the RBTC Audio Converter.
 
-## TODO:
+## TODO
 
 - [ ] Retry to connect to redis until it's successful HOW??
 - [x] Add a job that deletes job files after 3 days
