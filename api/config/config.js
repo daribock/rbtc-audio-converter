@@ -36,3 +36,4 @@ export const DEFAULT_JOB_REMOVE_CONFIG = {
 export const UPLOAD_DIR = "uploads/"
 export const PROCESSED_DIR = "processed/"
 export const DOWNLOAD_DIR = "downloads/"
+export const PUBLIC_DIR = "dist/"

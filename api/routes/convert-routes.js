@@ -18,9 +18,16 @@ const router = express.Router()
 // TODO: convert to post and only allow if correct password is provided that the user got via mail OR add the password automatically in the link
 router.post("/convert/files", async (req, res, next) => {
   const { jobId, subject, email, city, teacher } = req.body
+  console.log("/convert/files req.body", {
+    jobId,
+    subject,
+    email,
+    city,
+    teacher,
+  })
 
   if (!jobId || !subject || !email || !city || !teacher) {
-    const error = new Error("Missing required fields in body")
+    const error = new Error("Missing required fields")
     error.status = 400
     return next(error)
   }

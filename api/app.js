@@ -1,5 +1,7 @@
 import "dotenv/config"
-import cors from "cors"
+import path from "path"
+import { ROOT_PATH, PUBLIC_DIR } from "./config/config.js"
+// import cors from "cors"
 import express from "express"
 import helmet from "helmet"
 import logger from "./utils/logger.js"
@@ -8,6 +10,7 @@ import downloadRoutes from "./routes/download-routes.js"
 import uploadRoutes from "./routes/upload-routes.js"
 import convertRoutes from "./routes/convert-routes.js"
 import adminRoutes from "./routes/admin-routes.js"
+// import customCorsMiddleware from "./middlewares/custom-cors-middleware.js"
 
 const PORT = process.env.PORT || 8000
 
@@ -16,12 +19,13 @@ const app = express()
 app.use(express.json())
 
 // Initialize Middleware
-app.use(cors({ origin: "*" }))
+// app.use(customCorsMiddleware)
 app.use(helmet())
 
 // Initialize Routes
 app.use("/admin/queues", adminRoutes)
 app.use("/", downloadRoutes)
+app.use("/", express.static(path.join(ROOT_PATH, PUBLIC_DIR)))
 app.use("/", uploadRoutes)
 app.use("/", convertRoutes)
 
