@@ -2,7 +2,7 @@ import express from "express"
 import fs from "fs"
 import logger from "../utils/logger.js"
 import { UPLOAD_DIR } from "../config/config.js"
-import { createDirectory } from "../utils/file-utils.js"
+import { checkFoldersExistAsync, createDirectory } from "../utils/file-utils.js"
 
 const router = express.Router()
 
@@ -98,7 +98,26 @@ router.post("/upload/files", (req, res, next) => {
   const fileSize = parseInt(req.headers["file-size"], 10)
 
   const jobDir = `${UPLOAD_DIR}${uniqueJobId}`
-  createDirectory(jobDir)
+
+  try {
+    const { jobIdFolderExists } = checkFoldersExistAsync(uniqueJobId)
+
+    if (jobIdFolderExists) {
+      const error = new Error(
+        `Files for ${uniqueJobId} have already been uploaded`,
+      )
+      error.status = 400
+      return next(error)
+    } else {
+      createDirectory(jobDir)
+    }
+  } catch (err) {
+    const error = new Error(`Failed to create job directory`, {
+      stack: err.stack,
+    })
+    error.status = 400
+    return next(error)
+  }
 
   if (uploads[uploadId] && fileSize === uploads[uploadId].bytesReceived) {
     return logAndRespond(

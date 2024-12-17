@@ -16,18 +16,25 @@ export const getZipFileName = (jobId) => {
 }
 
 export const getFoldersByJobId = (jobId) => {
+  const jobIdFolderPath = path.join(ROOT_PATH, UPLOAD_DIR, jobId)
   const processedPath = path.join(ROOT_PATH, UPLOAD_DIR, jobId, PROCESSED_DIR)
   const downloadsPath = path.join(ROOT_PATH, UPLOAD_DIR, jobId, DOWNLOAD_DIR)
 
   return {
+    jobIdFolderPath,
     processedPath,
     downloadsPath,
   }
 }
 
 export const checkFoldersExistAsync = async (jobId) => {
-  const { processedPath, downloadsPath } = getFoldersByJobId(jobId)
+  const { processedPath, downloadsPath, jobIdFolderPath } =
+    getFoldersByJobId(jobId)
 
+  const jobIdFolderExists = await fs.promises
+    .access(jobIdFolderPath)
+    .then(() => true)
+    .catch(() => false)
   const processedExists = await fs.promises
     .access(processedPath)
     .then(() => true)
@@ -38,6 +45,7 @@ export const checkFoldersExistAsync = async (jobId) => {
     .catch(() => false)
 
   return {
+    jobIdFolderExists,
     processedExists,
     downloadsExists,
   }
