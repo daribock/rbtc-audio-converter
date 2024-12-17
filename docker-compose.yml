@@ -6,8 +6,6 @@ services:
     image: "redis:alpine"
     ports:
       - "6380:6380"
-    volumes:
-      - ./data:/var/lib/redis # Persist data
     environment:
       - REDIS_REPLICATION_MODE=master
     deploy:
