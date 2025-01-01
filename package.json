@@ -13,7 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@bull-board/api": "^6.0.0",
-    "@bull-board/express": "^6.0.0",
+    "@bull-board/express": "^6.5.4",
     "archiver": "^7.0.1",
     "bullmq": "^5.13.0",
     "cors": "^2.8.5",
