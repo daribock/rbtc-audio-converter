@@ -9,28 +9,28 @@ importers:
   .:
     dependencies:
       '@bull-board/api':
-        specifier: ^6.0.0
+        specifier: ^6.5.4
         version: 6.7.1(@bull-board/ui@6.7.1)
       '@bull-board/express':
-        specifier: ^6.0.0
+        specifier: ^6.5.4
         version: 6.7.1
       archiver:
         specifier: ^7.0.1
         version: 7.0.1
       bullmq:
-        specifier: ^5.13.0
+        specifier: ^5.34.6
         version: 5.36.0
       dotenv:
-        specifier: ^16.4.5
+        specifier: ^16.4.7
         version: 16.4.7
       express:
-        specifier: ^4.21.0
+        specifier: ^4.21.2
         version: 4.21.2
       helmet:
         specifier: ^8.0.0
         version: 8.0.0
       mailgun.js:
-        specifier: ^10.2.3
+        specifier: ^10.4.0
         version: 10.4.0
       winston:
         specifier: ^3.14.2
