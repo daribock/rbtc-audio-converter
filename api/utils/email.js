@@ -1,7 +1,7 @@
 import Mailgun from "mailgun.js"
 import formData from "form-data"
 import logger from "./logger.js"
-import { getZipFileName } from "./file-utils.js"
+import { getZipFileName } from "./file.js"
 
 const domain = process.env.EMAIL_DOMAIN || ""
 const mailgun = new Mailgun(formData)

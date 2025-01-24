@@ -1,5 +1,6 @@
 import "dotenv/config"
-import cors from "cors"
+import path from "path"
+import { ROOT_PATH, PUBLIC_DIR } from "./config/config.js"
 import express from "express"
 import helmet from "helmet"
 import logger from "./utils/logger.js"
@@ -16,12 +17,12 @@ const app = express()
 app.use(express.json())
 
 // Initialize Middleware
-app.use(cors({ origin: "*" }))
 app.use(helmet())
 
 // Initialize Routes
 app.use("/admin/queues", adminRoutes)
 app.use("/", downloadRoutes)
+app.use("/", express.static(path.join(ROOT_PATH, PUBLIC_DIR)))
 app.use("/", uploadRoutes)
 app.use("/", convertRoutes)
 

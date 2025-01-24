@@ -17,6 +17,9 @@ RUN npm install --omit=dev
 # Copy the rest of the application code
 COPY ./api ./api
 
+# Copy the rest of the application code
+COPY ./dist ./dist
+
 # Copy env file
 COPY .env .
 

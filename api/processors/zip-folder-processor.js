@@ -1,6 +1,6 @@
 import logger from "../utils/logger.js"
 import path from "path"
-import { zipFiles, checkFoldersExistAsync } from "../utils/file-utils.js"
+import { zipFiles, checkFoldersExistAsync } from "../utils/file.js"
 import { PROCESSED_DIR, UPLOAD_DIR, ROOT_PATH } from "../config/config.js"
 
 export default async function zipFolderProcessor(job) {
@@ -22,15 +22,18 @@ export default async function zipFolderProcessor(job) {
 
       job.log(error.message)
       logger.error(error.message)
-      await job.moveToFailed(error, true)
     }
 
     if (convertFoldersExist.downloadsExists) {
       const error = new Error(`Zip file for ${jobId} has already been created`)
 
-      job.log(error)
+      job.log(error.message)
       logger.error(error)
-      await job.moveToFailed(error, true)
+    } else {
+      job.log(`Creating zip folder for ${jobId}`)
+      logger.info(`Creating zip folder for ${jobId}`)
+
+      await zipFiles(processedDir, jobId)
     }
   } catch (err) {
     const error = new Error(
@@ -42,12 +45,7 @@ export default async function zipFolderProcessor(job) {
       message: error.message,
       stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
     })
-    await job.moveToFailed(error, true)
   }
-
-  job.log(`Creating zip folder for ${jobId}`)
-  logger.info(`Creating zip folder for ${jobId}`)
-  await zipFiles(processedDir, jobId)
 
   job.log(
     `Successfully Finished processing create zip folder job with id ${job.id}`,

@@ -1,6 +1,6 @@
 import logger from "../utils/logger.js"
 import sendEmail from "../utils/email.js"
-import { checkFoldersExistAsync } from "../utils/file-utils.js"
+import { checkFoldersExistAsync } from "../utils/file.js"
 
 export default async function sendEmailProcessor(job) {
   const { jobId, email } = job.data
@@ -20,7 +20,6 @@ export default async function sendEmailProcessor(job) {
 
       job.log(error.message)
       logger.error(error.message)
-      await job.moveToFailed(error, true)
     }
   } catch (err) {
     const error = new Error(
@@ -32,7 +31,6 @@ export default async function sendEmailProcessor(job) {
       message: error.message,
       stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
     })
-    await job.moveToFailed(error, true)
   }
 
   logger.info(`Send email for ${jobId}`)
@@ -49,7 +47,6 @@ export default async function sendEmailProcessor(job) {
       message: error.message,
       error: process.env.NODE_ENV === "production" ? undefined : err,
     })
-    await job.moveToFailed(error, true)
   }
 
   job.log(`Successfully Finished processing send email job with id ${job.id}`)
