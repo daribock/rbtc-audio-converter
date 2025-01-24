@@ -1,6 +1,6 @@
 import path from "path"
 import logger from "../utils/logger.js"
-import { processFile } from "../utils/file-utils.js"
+import { processFile } from "../utils/file.js"
 import { ROOT_PATH } from "../config/config.js"
 
 export default async function fileProcessor(job) {

@@ -1,6 +1,6 @@
 import logger from "../utils/logger.js"
 import path from "path"
-import { cleanupDirectories, getFoldersByJobId } from "../utils/file-utils.js"
+import { cleanupDirectories, getFoldersByJobId } from "../utils/file.js"
 import { sendEmailQueue } from "./../queues/send-email-queue.js"
 import { ROOT_PATH, UPLOAD_DIR } from "../config/config.js"
 

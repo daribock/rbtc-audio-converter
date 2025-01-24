@@ -1,6 +1,6 @@
 import logger from "../utils/logger.js"
 import path from "path"
-import { zipFiles, checkFoldersExistAsync } from "../utils/file-utils.js"
+import { zipFiles, checkFoldersExistAsync } from "../utils/file.js"
 import { PROCESSED_DIR, UPLOAD_DIR, ROOT_PATH } from "../config/config.js"
 
 export default async function zipFolderProcessor(job) {

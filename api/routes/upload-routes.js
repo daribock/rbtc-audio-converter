@@ -2,7 +2,7 @@ import express from "express"
 import fs from "fs"
 import logger from "../utils/logger.js"
 import { UPLOAD_DIR } from "../config/config.js"
-import { checkFoldersExistAsync, createDirectory } from "../utils/file-utils.js"
+import { checkFoldersExistAsync, createDirectory } from "../utils/file.js"
 
 const router = express.Router()
 

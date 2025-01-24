@@ -1,6 +1,6 @@
 import logger from "../utils/logger.js"
 import sendEmail from "../utils/email.js"
-import { checkFoldersExistAsync } from "../utils/file-utils.js"
+import { checkFoldersExistAsync } from "../utils/file.js"
 
 export default async function sendEmailProcessor(job) {
   const { jobId, email } = job.data
