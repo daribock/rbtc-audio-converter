@@ -1,12 +1,12 @@
 import winston from "winston"
 
 const logger = winston.createLogger({
-  level: "info",
+  level: "warn",
   format: winston.format.json(),
   transports: [
     // Write all logs with importance level of `error` or higher to `error.log`
     new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-    // Write all logs with importance level of `debug` or higher to `combined.log`
+    // Write all logs with importance level of `warn` or higher to `combined.log`
     new winston.transports.File({ filename: "logs/combined.log" }),
   ],
 })
@@ -19,10 +19,7 @@ if (process.env.NODE_ENV !== "production") {
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.printf(({ timestamp, level, message, ...args }) => {
-          const meta =
-            process.env.NODE_ENV === "production"
-              ? undefined
-              : `; Meta: ${JSON.stringify({ ...args })}`
+          const meta = `; Meta: ${JSON.stringify({ ...args })}`
 
           return `${timestamp} [${level.toUpperCase()}]: ${message}${meta}`
         }),
