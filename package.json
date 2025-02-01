@@ -15,7 +15,7 @@
     "@bull-board/api": "^6.5.4",
     "@bull-board/express": "^6.5.4",
     "archiver": "^7.0.1",
-    "bullmq": "^5.34.6",
+    "bullmq": "^5.39.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "helmet": "^8.0.0",
