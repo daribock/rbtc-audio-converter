@@ -1,0 +1,56 @@
+# Changelog
+
+## 1.0.0 (2025-02-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* Add authentication to admin routes ([#32](https://github.com/daribock/rbtc-audio-converter-backend/issues/32))
+
+### Features
+
+* Add authentication to admin routes ([#32](https://github.com/daribock/rbtc-audio-converter-backend/issues/32)) ([2e64925](https://github.com/daribock/rbtc-audio-converter-backend/commit/2e64925e30b3985e8fc26cd37975d479953d344b))
+* add bull-board ([02733fd](https://github.com/daribock/rbtc-audio-converter-backend/commit/02733fdf076b6f99c82b309b120854783a105ce4))
+* add bullMQ flow process ([59467f0](https://github.com/daribock/rbtc-audio-converter-backend/commit/59467f0e1bdfb4a1b1432b7e81740d2f5213d58a))
+* add checks for jobs if a job is allowed to run or not ([5300bbd](https://github.com/daribock/rbtc-audio-converter-backend/commit/5300bbd5af26f4510537793ab3d2edb36ba750d6))
+* add ci and update packages ([1c66fdc](https://github.com/daribock/rbtc-audio-converter-backend/commit/1c66fdc301ca19f311c7634b2dd70df6f19b223d))
+* add cleanupQueue to cleanup job folder after 3 days ([b96fc60](https://github.com/daribock/rbtc-audio-converter-backend/commit/b96fc60239139b3b6104c558d16560a55a623936))
+* add cors config ([267f2bf](https://github.com/daribock/rbtc-audio-converter-backend/commit/267f2bf1782dc557cf0bc91281b78421422529f3))
+* add custom-cors func ([cf7ea75](https://github.com/daribock/rbtc-audio-converter-backend/commit/cf7ea75c326d4af25b152f4afb3db9177f03fce2))
+* add demo email sending ([8618506](https://github.com/daribock/rbtc-audio-converter-backend/commit/86185060a1969d2bd8d5e0f7c625c05e2a937f40))
+* add download route ([9bb1459](https://github.com/daribock/rbtc-audio-converter-backend/commit/9bb14592f04291be5bd8a352cfb5aed1639d6fe3))
+* add error handler middleware ([f94203c](https://github.com/daribock/rbtc-audio-converter-backend/commit/f94203c543156cdd347e039fa96f9e799fcf0b34))
+* add file processing 🥳 ([ba1df15](https://github.com/daribock/rbtc-audio-converter-backend/commit/ba1df1515556b7bcdaee16cbcfcb3490ae0a86d0))
+* add first bullmq implementation ([c682a42](https://github.com/daribock/rbtc-audio-converter-backend/commit/c682a42a590e89610a48a450364f9349b008c9d6))
+* add frontend route ([4b2bcd5](https://github.com/daribock/rbtc-audio-converter-backend/commit/4b2bcd58a0b705f410ba499041749f3ad096ec7e))
+* add helmet and config files for redis ([45bee12](https://github.com/daribock/rbtc-audio-converter-backend/commit/45bee12e14ee9b778d91266466ba33f641ba142b))
+* add mailgun to send emails ([cf1bf8e](https://github.com/daribock/rbtc-audio-converter-backend/commit/cf1bf8e66aeda4b22be0666296a0d1b8f039ed7b))
+* add new routes and enable chunking with the ability to continue uploads ([08f540b](https://github.com/daribock/rbtc-audio-converter-backend/commit/08f540bb7482d5b86d4290376ce4a2954000c829))
+* add release-please workflow ([393ee9b](https://github.com/daribock/rbtc-audio-converter-backend/commit/393ee9bdd2f9a6bcd23627791aa524f4a086e8bc))
+* add unique upload jobs ([13e716e](https://github.com/daribock/rbtc-audio-converter-backend/commit/13e716ee33b76eba248ccecea5bfceebf043890d))
+* add upload-routes.js ([dcb6b07](https://github.com/daribock/rbtc-audio-converter-backend/commit/dcb6b0790dcff520a238fd90a88868f58ee28241))
+* correctly write track number ([7358571](https://github.com/daribock/rbtc-audio-converter-backend/commit/7358571ace614011baf2aedf30ecb46cdefbf0db))
+* create zip folder ([dc056c9](https://github.com/daribock/rbtc-audio-converter-backend/commit/dc056c9d3182aad4d1c203b832da246fb9794119))
+* do not persist redis data ([834cddc](https://github.com/daribock/rbtc-audio-converter-backend/commit/834cddc0be87bd97f3d6ad6630b35bcde82099d9))
+* enhance logging ([b590c09](https://github.com/daribock/rbtc-audio-converter-backend/commit/b590c09c83ea71642f8c39cb50cedcc81808267d))
+* exclude js from linting ([2b25de3](https://github.com/daribock/rbtc-audio-converter-backend/commit/2b25de35f7109800d2cc1e1ddc8a2b14b681be2a))
+* initial commit ([0c1858a](https://github.com/daribock/rbtc-audio-converter-backend/commit/0c1858af04d8c149dd2e583ce29b3a25e46bfb32))
+* make ready for prod ([96cfcf9](https://github.com/daribock/rbtc-audio-converter-backend/commit/96cfcf9be932d2028d950d51beb4ad778de46e3b))
+* only process one file at a time ([b1fd988](https://github.com/daribock/rbtc-audio-converter-backend/commit/b1fd988f1adcf56f9fb0d8838b632c544d251573))
+* reafactor code ([da38e0a](https://github.com/daribock/rbtc-audio-converter-backend/commit/da38e0a79c2e55a27ef6e35952a8e9c9e600f9a1))
+* rename file-utils to file ([1b52301](https://github.com/daribock/rbtc-audio-converter-backend/commit/1b52301da1b4fce6b952694b31419a2aaf896b5e))
+* update cors config ([a8aecb1](https://github.com/daribock/rbtc-audio-converter-backend/commit/a8aecb1cc09b9a6831ae39482bd88d5b1a5b98f8))
+* update dependencies ([ba3b80b](https://github.com/daribock/rbtc-audio-converter-backend/commit/ba3b80bab82be1b983fc243824ff05a289a4d84d))
+* update docker-compose file ([6309138](https://github.com/daribock/rbtc-audio-converter-backend/commit/6309138abf6bd90c8a3a96b3a8f836d640b11e94))
+* update dockerfile ([dcbea2e](https://github.com/daribock/rbtc-audio-converter-backend/commit/dcbea2eeac4d1b8cfbc500c65522fc4820663e71))
+* update email message ([cad4db6](https://github.com/daribock/rbtc-audio-converter-backend/commit/cad4db63849b03be9aefc40ceca1cb1792821604))
+* update redis port to 6380 ([c495838](https://github.com/daribock/rbtc-audio-converter-backend/commit/c495838c28ce8516a7e4736eaeb2c40a8623a519))
+* update redis port to 6479 ([a1aedab](https://github.com/daribock/rbtc-audio-converter-backend/commit/a1aedab4855544c01fd9b162645ed5e64d871368))
+* update release-please token ([e5e3d00](https://github.com/daribock/rbtc-audio-converter-backend/commit/e5e3d00769617743db7aa0460545d2cd3b1b71ff))
+
+
+### Bug Fixes
+
+* file processing ([37ccbb8](https://github.com/daribock/rbtc-audio-converter-backend/commit/37ccbb82ce1be2931684fccdfe6e1277252fbc55))
+* remove cors ([ea9e50f](https://github.com/daribock/rbtc-audio-converter-backend/commit/ea9e50f32ac3269cf59038a0041a1af9c9f76c1c))
+* remove moveToFailed func ([e948f1a](https://github.com/daribock/rbtc-audio-converter-backend/commit/e948f1aaa0ff2779669dc596f8084fa9ae84fc26))
