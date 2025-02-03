@@ -5,8 +5,11 @@ import { BullMQAdapter } from "@bull-board/api/bullMQAdapter.js"
 import { createZipFolderQueue } from "./../queues/create-zip-folder-queue.js"
 import { sendEmailQueue } from "./../queues/send-email-queue.js"
 import { cleanupQueue } from "./../queues/cleanup-queue.js"
+import { ROUTES } from "../config/config.js"
 
 const serverAdapter = new ExpressAdapter()
+serverAdapter.setBasePath(ROUTES.bullBoard)
+
 createBullBoard({
   queues: [
     new BullMQAdapter(fileProcessorQueue),
@@ -16,6 +19,5 @@ createBullBoard({
   ],
   serverAdapter: serverAdapter,
 })
-serverAdapter.setBasePath("/admin/queues")
 
 export default serverAdapter.getRouter()

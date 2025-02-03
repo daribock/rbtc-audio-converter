@@ -1,7 +1,7 @@
 import express from "express"
 import fs from "fs"
 import logger from "../utils/logger.js"
-import { UPLOAD_DIR } from "../config/config.js"
+import { ROUTES, UPLOAD_DIR } from "../config/config.js"
 import { checkFoldersExistAsync, createDirectory } from "../utils/file.js"
 
 const router = express.Router()
@@ -23,7 +23,7 @@ const logAndRespond = (message, status, res, additionalData = {}) => {
 
 let uploads = {}
 
-router.get("/upload/status", (req, res, next) => {
+router.get(ROUTES.uploadStatus, (req, res, next) => {
   const headersToValidate = ["x-file-name", "x-job-id", "file-size"]
   validateHeaders(req, res, next, headersToValidate)
 
@@ -81,7 +81,7 @@ router.get("/upload/status", (req, res, next) => {
   }
 })
 
-router.post("/upload/files", (req, res, next) => {
+router.post(ROUTES.uploadFiles, (req, res, next) => {
   const headersToValidate = [
     "x-file-name",
     "x-job-id",
@@ -167,7 +167,7 @@ router.post("/upload/files", (req, res, next) => {
   })
 })
 
-router.get("/upload/complete", (req, res, next) => {
+router.get(ROUTES.uploadComplete, (req, res, next) => {
   const headersToValidate = ["x-file-name", "x-job-id"]
   validateHeaders(req, res, next, headersToValidate)
 
