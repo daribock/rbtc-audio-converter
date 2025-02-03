@@ -4,6 +4,8 @@ import {
   DEFAULT_JOB_REMOVE_CONFIG,
   UPLOAD_DIR,
   REDIS_CONNECTION_CONFIG,
+  KEEP_FILES_FOR,
+  ROUTES,
 } from "./../config/config.js"
 import { checkFoldersExistAsync, getAllFilesInDir } from "../utils/file.js"
 import logger from "./../utils/logger.js"
@@ -12,7 +14,7 @@ const flowProducer = new FlowProducer({ connection: REDIS_CONNECTION_CONFIG })
 
 const router = express.Router()
 
-router.post("/convert/files", async (req, res, next) => {
+router.post(ROUTES.convertFiles, async (req, res, next) => {
   const { jobId, subject, email, city, teacher } = req.body
 
   if (!jobId || !subject || !email || !city || !teacher) {
@@ -44,14 +46,13 @@ router.post("/convert/files", async (req, res, next) => {
     .then(async (files) => {
       try {
         logger.debug(`Creating flow for ${jobId}`)
-        const threeDayDelay = 3 * 24 * 60 * 60 * 1000 // 3 days
 
         await flowProducer.add(
           {
             name: `cleanup-${jobId}`,
             queueName: "cleanupQueue",
             data: { jobId },
-            opts: { delay: threeDayDelay },
+            opts: { delay: KEEP_FILES_FOR },
             children: [
               {
                 name: `send-email-${jobId}`,
