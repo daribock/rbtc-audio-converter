@@ -12,7 +12,7 @@
   "author": "Darius Kletter <darikletter@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@bull-board/express": "^6.5.4",
+    "@bull-board/express": "^6.7.10",
     "archiver": "^7.0.1",
     "bullmq": "^5.34.6",
     "connect-ensure-login": "^0.1.1",
