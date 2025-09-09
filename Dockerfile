@@ -9,22 +9,22 @@ RUN apt-get update && \
   apt-get install -y ffmpeg eyed3
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+COPY ./packages/api/package*.json ./
 
 # Install dependencies
 RUN npm install --omit=dev
 
 # Copy the rest of the application code
-COPY ./api ./api
+COPY ./packages/api .
 
 # Copy the rest of the application code
-COPY ./dist ./dist
+COPY ./packages/frontend/dist ./dist
 
 # Copy env file
-COPY .env .
+COPY ../packages/api/.env .
 
 # Expose the port the app runs on
 EXPOSE 8000
 
 # Run the app
-CMD ["node", "./api/app.js"]
+CMD ["node", "app.js"]

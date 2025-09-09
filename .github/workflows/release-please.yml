@@ -18,5 +18,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
-          package-name: rbtc-audio-convertor-backend
+          package-name: rbtc-audio-convertor
 

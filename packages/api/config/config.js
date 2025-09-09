@@ -1,10 +1,11 @@
 import path from "path"
+import process from "process"
 import { fileURLToPath } from "url"
 
 // Define __filename and __dirname
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-export const ROOT_PATH = path.join(__dirname, "../..")
+export const ROOT_PATH = path.join(__dirname, "..")
 
 export const REDIS_HOST = process.env.REDIS_HOST || "0.0.0.0"
 export const REDIS_PORT = process.env.REDIS_PORT

@@ -1,38 +1,16 @@
 {
-  "name": "rbtc-audio-convertor-backend",
-  "version": "1.0.0",
-  "type": "module",
+  "name": "rbtc-audio-convertor",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "start": "node api/app.js",
-    "start:production": "NODE_ENV=production node api/app.js",
-    "dev": "nodemon api/app.js",
-    "lint": "eslint 'api/**/*.js'",
-    "format": "prettier --write 'api/**/*.{js,ts}'"
+    "dev": "lerna run dev"
   },
-  "author": "Darius Kletter <darikletter@gmail.com>",
-  "license": "MIT",
   "dependencies": {
-    "@bull-board/express": "^6.5.4",
-    "archiver": "^7.0.1",
-    "bullmq": "^5.34.6",
-    "connect-ensure-login": "^0.1.1",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "express-session": "^1.18.1",
-    "helmet": "^8.0.0",
-    "mailgun.js": "^10.4.0",
-    "passport": "^0.7.0",
-    "passport-local": "^1.0.0",
-    "winston": "^3.14.2"
+    "cors": "^2.8.5"
   },
   "devDependencies": {
-    "@eslint/js": "^9.10.0",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.30.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "globals": "^15.9.0",
-    "nodemon": "^3.1.4"
+    "lerna": "^8.2.3"
   }
 }

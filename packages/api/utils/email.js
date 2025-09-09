@@ -1,14 +1,15 @@
-import Mailgun from "mailgun.js"
-import formData from "form-data"
+import nodemailer from "nodemailer"
+import process from "process"
 import logger from "./logger.js"
 import { getZipFileName } from "./file.js"
 
-const domain = process.env.EMAIL_DOMAIN || ""
-const mailgun = new Mailgun(formData)
-const mg = mailgun.client({
-  username: "api",
-  key: process.env.EMAIL_API_KEY || "",
-  url: "https://api.eu.mailgun.net",
+// Create reusable transporter object using one.com SMTP
+const transporter = nodemailer.createTransport({
+  service: "One",
+  auth: {
+    user: process.env.MAIL_USER, // your one.com email address
+    pass: process.env.MAIL_PASS, // your one.com email password
+  },
 })
 
 const sendEmail = async (toEmails, jobId) => {
@@ -28,18 +29,21 @@ const sendEmail = async (toEmails, jobId) => {
             </div>
         </div>
     `
-  const fromEmail = `RBTC Audio Converter <no-reply@${domain}>`
+  const fromEmail = `RBTC Audio Converter <${process.env.MAIL_USER}>`
 
-  await mg.messages
-    .create(domain, {
+  try {
+    await transporter.sendMail({
       from: fromEmail,
       to: toEmails,
       subject: "RBTC converted audios",
       html: emailBody,
     })
-    .then(() => {
-      logger.info(`Email was sent for jobId: ${jobId}`)
-    })
+
+    logger.info(`Email was sent for jobId: ${jobId}`)
+  } catch (error) {
+    logger.error(`Failed to send email for jobId: ${jobId}`, error)
+    throw error
+  }
 }
 
 export default sendEmail
