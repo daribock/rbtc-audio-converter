@@ -61,7 +61,7 @@ passport.deserializeUser((user, cb) => {
 const app = express()
 
 // Configure view engine to render EJS templates.
-app.set("views", ROOT_PATH + "/api/views")
+app.set("views", ROOT_PATH + "/views")
 
 // Apply CORS only in development
 if (process.env.NODE_ENV !== "production") {
@@ -154,9 +154,35 @@ app.get("*", (req, res) => {
 
 app.use(errorHandler)
 
-app.listen(PORT, () => {
-  logger.info("RBTC audio converter successfully started! 🚀")
-  logger.debug(`Api is listening at http://localhost:${PORT}`)
-  logger.debug("For the UI, open http://localhost:8000/admin/queues")
-  logger.debug("Make sure Redis is running on port 6379 by default")
+// Initialize Redis infrastructure and start server
+export async function startServer() {
+  try {
+    // Start the Express server
+    app.listen(PORT, () => {
+      logger.info("RBTC audio converter successfully started! 🚀")
+      logger.debug(`Api is listening at http://localhost:${PORT}`)
+      logger.debug("For the UI, open http://localhost:8000/admin/queues")
+
+      if (process.env.NODE_ENV === "production") {
+        logger.debug("Production mode: Make sure Redis is running externally")
+      } else {
+        logger.debug("Development mode: Redis container auto-managed")
+      }
+    })
+  } catch (error) {
+    logger.error("Failed to start server:", error.message)
+
+    process.exit(1)
+  }
+}
+
+// Handle graceful shutdown
+process.on("SIGTERM", async () => {
+  logger.info("Received SIGTERM, shutting down gracefully...")
+  process.exit(0)
+})
+
+process.on("SIGINT", async () => {
+  logger.info("Received SIGINT, shutting down gracefully...")
+  process.exit(0)
 })

@@ -3,15 +3,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "NODE_ENV=development node app.js",
-    "start:production": "NODE_ENV=production node app.js",
-    "dev": "NODE_ENV=development nodemon app.js",
+    "start": "NODE_ENV=development node index.js",
+    "start:production": "NODE_ENV=production node index.js",
+    "dev": "NODE_ENV=development nodemon index.js",
     "lint": "eslint '**/*.js'",
     "format": "prettier --write '**/*.{js,ts}'"
   },
   "author": "Darius Kletter <darikletter@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@bull-board/api": "^6.12.7",
     "@bull-board/express": "^6.5.4",
     "archiver": "^7.0.1",
     "bullmq": "^5.34.6",

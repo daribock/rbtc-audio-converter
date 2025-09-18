@@ -1,7 +1,7 @@
 import { fileProcessorQueue } from "./../queues/file-processor-queue.js"
 import { ExpressAdapter } from "@bull-board/express"
 import { createBullBoard } from "@bull-board/api"
-import { BullMQAdapter } from "@bull-board/api/bullMQAdapter.js"
+import { BullMQAdapter } from "@bull-board/api/bullMQAdapter"
 import { createZipFolderQueue } from "./../queues/create-zip-folder-queue.js"
 import { sendEmailQueue } from "./../queues/send-email-queue.js"
 import { cleanupQueue } from "./../queues/cleanup-queue.js"

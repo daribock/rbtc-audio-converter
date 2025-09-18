@@ -1,4 +1,5 @@
 import winston from "winston"
+import process from "process"
 
 const logger = winston.createLogger({
   level: "warn",
