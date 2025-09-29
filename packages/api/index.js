@@ -11,7 +11,7 @@ async function startInfrastructure() {
     })
 
     // Only auto-start Redis in development mode
-    if (!process.env.START_INFRASTRUCTURE === "true") {
+    if (process.env.START_INFRASTRUCTURE === "true") {
       logger.info("Ensuring Redis is available..." + process.env.NODE_ENV)
       await redisInfra.ensureRedisRunning()
       const connectionInfo = redisInfra.getConnectionInfo()
@@ -27,7 +27,7 @@ async function startInfrastructure() {
     logger.error("Redis infrastructure error:", error)
 
     // In development, provide helpful error message
-    if (!process.env.START_INFRASTRUCTURE === "true") {
+    if (process.env.START_INFRASTRUCTURE === "true") {
       logger.info("Tips:")
       logger.info("1. Make sure Docker or Podman is installed and running")
       logger.info(
