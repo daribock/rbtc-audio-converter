@@ -1,5 +1,6 @@
 import archiver from "archiver"
 import fs from "fs"
+import process from "process"
 import path from "path"
 import { exec } from "child_process"
 import {

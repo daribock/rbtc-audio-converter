@@ -1,4 +1,5 @@
 import logger from "../utils/logger.js"
+import process from "process"
 import path from "path"
 import { zipFiles, checkFoldersExistAsync } from "../utils/file.js"
 import { PROCESSED_DIR, UPLOAD_DIR, ROOT_PATH } from "../config/config.js"

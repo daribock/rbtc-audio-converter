@@ -5,7 +5,8 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "lerna run dev"
+    "dev": "lerna run dev",
+    "lint": "lerna run lint"
   },
   "dependencies": {
     "cors": "^2.8.5"

@@ -1,4 +1,5 @@
 import { Worker } from "bullmq"
+import process from "process"
 import path from "path"
 import { fileURLToPath } from "url"
 import { REDIS_CONNECTION_CONFIG } from "./config/config.js"
