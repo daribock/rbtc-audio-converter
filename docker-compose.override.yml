@@ -12,3 +12,4 @@ services:
     environment:
       # Override to development
       - NODE_ENV=development
+      - START_INFRASTRUCTURE=true
