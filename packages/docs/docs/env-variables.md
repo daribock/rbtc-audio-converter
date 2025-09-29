@@ -1,6 +1,6 @@
-## 📝 Environment Variables
+# Environment Variables
 
-### Required Variables
+## Required Variables
 
 | Variable    | Description            | Example                  |
 | ----------- | ---------------------- | ------------------------ |
@@ -8,7 +8,7 @@
 | `MAIL_USER` | One.com email address  | `noreply@yourdomain.com` |
 | `MAIL_PASS` | One.com email password | `your-secure-password`   |
 
-### Optional Variables
+## Optional Variables
 
 | Variable     | Description      | Default       |
 | ------------ | ---------------- | ------------- |

@@ -1,3 +1,7 @@
+---
+slug: /
+---
+
 # RBTC Audio Converter - Step-by-Step Guide
 
 ## 📖 Overview
@@ -20,6 +24,7 @@ The RBTC Audio Converter is a universal script that converts WAV audio files to 
 ### Step 1: Install WSL (Windows Subsystem for Linux)
 
 1. **Open PowerShell as Administrator**
+
    - Press `Windows + X`
    - Select "Windows PowerShell (Admin)" or "Terminal (Admin)"
 
@@ -39,6 +44,7 @@ The RBTC Audio Converter is a universal script that converts WAV audio files to 
 ### Step 2: Update WSL and Install Dependencies
 
 1. **Open WSL Terminal**
+
    - Press `Windows + R`, type `wsl`, press Enter
    - Or search for "Ubuntu" in Start menu
 
@@ -56,6 +62,7 @@ The RBTC Audio Converter is a universal script that converts WAV audio files to 
 ### Step 3: Get the Script
 
 1. **Download the script file**
+
    - Copy the `rbtc-audio-converter.sh` file to your Windows Downloads folder
 
 2. **Make the script executable**
@@ -231,6 +238,7 @@ SUCCESSFULLY CONVERTED FILES:
 ## 📁 File Organization
 
 **Before conversion:**
+
 ```
 2025-09-29-lesson/
 ├── roh/
@@ -241,6 +249,7 @@ SUCCESSFULLY CONVERTED FILES:
 ```
 
 **After conversion:**
+
 ```
 2025-09-29-lesson/
 ├── roh/
