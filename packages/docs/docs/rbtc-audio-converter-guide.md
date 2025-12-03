@@ -145,8 +145,9 @@ sudo pacman -S ffmpeg eyed3
 
 1. **Create a folder** for your recording session
 2. **Place your WAV files** in this folder
-3. **Copy the script** (`rbtc-audio-converter.sh`) into the same folder
-4. **Add logo file** (`logo.jpg`) in the folder or parent directory
+3. **Download the script** from here: https://github.com/daribock/rbtc-audio-converter/blob/master/scripts/rbtc-audio-converter.sh
+4. **Copy the script** (`rbtc-audio-converter.sh`) into the same folder
+5. **Add logo file** (`logo.jpg`) in the folder or parent directory
 
 **Example folder structure:**
 
