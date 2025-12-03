@@ -13,5 +13,6 @@
   },
   "devDependencies": {
     "lerna": "^8.2.3"
-  }
+  },
+  "version": "1.1.0"
 }
