@@ -52,15 +52,9 @@
 // // In this file you can include the rest of your app's specific main process
 // // code. You can also put them in separate files and import them here.
 
-import { app, BrowserWindow, ipcMain, dialog, shell } from "electron";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import * as path from "path";
 import * as fs from "fs";
-import ffmpeg from "fluent-ffmpeg";
-import ffmpegStatic from "ffmpeg-static";
-import NodeID3 from "node-id3";
-
-// Set FFmpeg path
-ffmpeg.setFfmpegPath(ffmpegStatic as string);
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -73,10 +67,10 @@ let mainWindow: BrowserWindow | null = null;
 
 const createWindow = (): void => {
   mainWindow = new BrowserWindow({
-    height: 800,
-    width: 1000,
-    minWidth: 800,
-    minHeight: 700,
+    height: 700,
+    width: 900,
+    minWidth: 700,
+    minHeight: 600,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       contextIsolation: true,
@@ -87,11 +81,15 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 };
 
-// IPC: Select WAV files
-ipcMain.handle("select-wav-files", async () => {
-  const result = await dialog.showOpenDialog(mainWindow!, {
+// IPC: Select audio files
+ipcMain.handle("select-audio-files", async () => {
+  if (!mainWindow) return [];
+
+  const result = await dialog.showOpenDialog(mainWindow, {
     properties: ["openFile", "multiSelections"],
-    filters: [{ name: "WAV Audio Files", extensions: ["wav", "WAV"] }],
+    filters: [
+      { name: "Audio Files", extensions: ["wav", "mp3", "m4a", "flac", "ogg"] }
+    ],
   });
   if (result.canceled) return [];
   return result.filePaths.map((filePath) => ({
@@ -99,208 +97,6 @@ ipcMain.handle("select-wav-files", async () => {
     name: path.basename(filePath),
     size: fs.statSync(filePath).size,
   }));
-});
-
-// IPC: Select cover art
-ipcMain.handle("select-cover-art", async () => {
-  const result = await dialog.showOpenDialog(mainWindow!, {
-    properties: ["openFile"],
-    filters: [{ name: "Image Files", extensions: ["jpg", "jpeg", "png"] }],
-  });
-  if (result.canceled) return null;
-  return {
-    path: result.filePaths[0],
-    name: path.basename(result.filePaths[0]),
-  };
-});
-
-// IPC: Select output folder
-ipcMain.handle("select-output-folder", async () => {
-  const result = await dialog.showOpenDialog(mainWindow!, {
-    properties: ["openDirectory", "createDirectory"],
-  });
-  if (result.canceled) return null;
-  return result.filePaths[0];
-});
-
-// Parse date from filename (YYYY_MMDD_HHMM format)
-function parseDateFromFilename(filename: string): {
-  year: string;
-  month: string;
-  day: string;
-} {
-  const filenameNoExt = path.basename(filename, path.extname(filename));
-  const match = filenameNoExt.match(/^(\d{4})_(\d{4})_(\d{4})/);
-  if (match) {
-    return {
-      year: match[1].slice(2, 4),
-      month: match[2].slice(0, 2),
-      day: match[2].slice(2, 4),
-    };
-  }
-  const now = new Date();
-  return {
-    year: String(now.getFullYear()).slice(2, 4),
-    month: String(now.getMonth() + 1).padStart(2, "0"),
-    day: String(now.getDate()).padStart(2, "0"),
-  };
-}
-
-function getFileCreationYear(filePath: string): string {
-  try {
-    const stats = fs.statSync(filePath);
-    return String(stats.birthtime.getFullYear());
-  } catch {
-    return String(new Date().getFullYear());
-  }
-}
-
-// Convert using FFmpeg
-async function convertFile(
-  inputPath: string,
-  outputPath: string,
-  onProgress: (percent: number) => void,
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      .audioCodec("libmp3lame")
-      .audioBitrate("192k")
-      .audioFilters(
-        "silenceremove=stop_periods=-1:stop_threshold=-35dB:stop_duration=0.5",
-      )
-      .output(outputPath)
-      .on("progress", (progress) => {
-        if (progress.percent) onProgress(progress.percent);
-      })
-      .on("end", () => resolve())
-      .on("error", (err) => reject(err))
-      .run();
-  });
-}
-
-// Add ID3 metadata
-// function addMetadata(
-//   filePath: string,
-//   metadata: {
-//     artist: string;
-//     title: string;
-//     album: string;
-//     trackNumber: string;
-//     year: string;
-//     coverArtPath?: string;
-//   },
-// ): boolean {
-//   const tags: NodeID3.Tags = {
-//     artist: metadata.artist,
-//     title: metadata.title,
-//     album: metadata.album,
-//     trackNumber: metadata.trackNumber,
-//     year: metadata.year,
-//   };
-//   if (metadata.coverArtPath && fs.existsSync(metadata.coverArtPath)) {
-//     tags.image = {
-//       mime: metadata.coverArtPath.toLowerCase().endsWith(".png")
-//         ? "image/png"
-//         : "image/jpeg",
-//       type: { id: 3, name: "front cover" },
-//       description: "Cover",
-//       imageBuffer: fs.readFileSync(metadata.coverArtPath),
-//     };
-//   }
-//   return NodeID3.write(tags, filePath) !== false;
-// }
-
-interface ConversionOptions {
-  files: { path: string; name: string }[];
-  subject: string;
-  city: string;
-  teacher: string;
-  outputFolder: string;
-  coverArtPath?: string;
-}
-
-// IPC: Convert files
-ipcMain.handle("convert-files", async (_event, options: ConversionOptions) => {
-  const { files, subject, city, teacher, outputFolder, coverArtPath } = options;
-  const results: {
-    success: boolean;
-    inputFile: string;
-    outputFile?: string;
-    error?: string;
-  }[] = [];
-
-  if (!fs.existsSync(outputFolder)) {
-    fs.mkdirSync(outputFolder, { recursive: true });
-  }
-
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const trackIndex = String(i + 1).padStart(2, "0");
-    const dateInfo = parseDateFromFilename(file.name);
-    const creationYear = getFileCreationYear(file.path);
-    const newFilename = `${dateInfo.year}${dateInfo.month}${dateInfo.day} ${subject} ${trackIndex} ${city} ${teacher}.mp3`;
-    const outputPath = path.join(outputFolder, newFilename);
-
-    try {
-      mainWindow?.webContents.send("conversion-progress", {
-        currentFile: i + 1,
-        totalFiles: files.length,
-        fileName: file.name,
-        status: "converting",
-        fileProgress: 0,
-      });
-
-      await convertFile(file.path, outputPath, (percent) => {
-        mainWindow?.webContents.send("conversion-progress", {
-          currentFile: i + 1,
-          totalFiles: files.length,
-          fileName: file.name,
-          status: "converting",
-          fileProgress: percent,
-        });
-      });
-
-      mainWindow?.webContents.send("conversion-progress", {
-        currentFile: i + 1,
-        totalFiles: files.length,
-        fileName: file.name,
-        status: "adding-metadata",
-        fileProgress: 100,
-      });
-
-      // addMetadata(outputPath, {
-      //   artist: teacher,
-      //   title: newFilename.replace(".mp3", ""),
-      //   album: subject,
-      //   trackNumber: trackIndex,
-      //   year: creationYear,
-      //   coverArtPath,
-      // });
-
-      results.push({
-        success: true,
-        inputFile: file.name,
-        outputFile: newFilename,
-      });
-    } catch (error) {
-      results.push({
-        success: false,
-        inputFile: file.name,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  }
-
-  mainWindow?.webContents.send("conversion-complete", {
-    results,
-    outputFolder,
-  });
-  return results;
-});
-
-// IPC: Open folder
-ipcMain.handle("open-folder", async (_event, folderPath: string) => {
-  shell.openPath(folderPath);
 });
 
 app.on("ready", createWindow);

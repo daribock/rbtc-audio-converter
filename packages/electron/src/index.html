@@ -2,9 +2,53 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Rbtc Audio Converter</title>
+    <title>RBTC Audio Converter</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="app">
+      <header>
+        <h1>RBTC Audio Converter</h1>
+        <p>Simple audio file converter</p>
+      </header>
+
+      <main>
+        <section class="upload-section">
+          <h2>Upload Audio Files</h2>
+          <button id="selectFilesBtn" class="btn btn-primary">
+            Select Audio Files
+          </button>
+          <div id="fileList" class="file-list"></div>
+        </section>
+
+        <section class="input-section">
+          <h2>Conversion Settings</h2>
+          <div class="form-group">
+            <label for="subjectInput">Subject (Fachkürzel):</label>
+            <input type="text" id="subjectInput" placeholder="e.g., BWL, RE, WI" />
+          </div>
+
+          <div class="form-group">
+            <label for="cityInput">City:</label>
+            <input type="text" id="cityInput" placeholder="e.g., Berlin, Munich" />
+          </div>
+
+          <div class="form-group">
+            <label for="teacherInput">Teacher (Lehrerkürzel):</label>
+            <input type="text" id="teacherInput" placeholder="e.g., MM, JS" />
+          </div>
+        </section>
+
+        <section class="action-section">
+          <button id="convertBtn" class="btn btn-success" disabled>
+            Convert Files
+          </button>
+          <p class="note">Note: Conversion functionality will be implemented later</p>
+        </section>
+      </main>
+
+      <footer>
+        <p>&copy; 2024 RBTC Audio Converter</p>
+      </footer>
+    </div>
   </body>
 </html>
