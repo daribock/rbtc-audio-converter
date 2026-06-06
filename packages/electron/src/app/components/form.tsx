@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { cleanZoomAudioFile } from "../utils/audioUtils";
-import "../utils/electronAPI.types";
+import { cleanZoomAudioFile } from "../utils/audio-utils";
+import "../utils/electron-api.types";
 
 export default function Form() {
   const [file, setFile] = useState<File | null>(null);
