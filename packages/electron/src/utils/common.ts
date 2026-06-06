@@ -3,6 +3,8 @@ import * as fs from 'fs';
 /**
  * Scans a WAV file and repairs its RIFF and data chunk sizes based on the true file size.
  * Perfect for fixing Zoom PodTrak files.
+ *
+ * @deprecated This function is no longer needed since we switched to a streaming conversion approach that doesn't load the entire file into memory. However, it can still be useful for debugging or for users who want to manually fix their WAV files before conversion.
  */
 export function fixZoomWavHeader(absoluteFilePath: string): boolean {
   try {
@@ -82,6 +84,25 @@ export async function convertFileToArrayBuffer(file: File) {
   }
 }
 
+/**
+ * Identifies the true file format by analyzing the file's magic bytes (header signature).
+ *
+ * Reads the first 16 bytes of a file and displays hexadecimal and ASCII representations
+ * to help determine the actual file format. Useful for detecting files with incorrect
+ * extensions or corrupted headers (e.g., Zoom recorder artifacts).
+ *
+ * @param absoluteFilePath - Full file path to analyze
+ *
+ * @returns void - Logs detection results and diagnostic info to console
+ *
+ * @example
+ * identifyTrueFileFormat('/path/to/audio.wav');
+ * // --- DATEI DETEKTIV ---
+ * // Pfad: /path/to/audio.wav
+ * // HEX-Werte: 52 49 46 46 ...
+ * // ASCII-Text: RIFF ...
+ * // Ergebnis: Es IST eine WAV/AVI-Datei (RIFF Header gefunden).
+ */
 export function identifyTrueFileFormat(absoluteFilePath: string) {
   try {
     // 1. Datei nur zum Lesen öffnen

@@ -1,62 +1,6 @@
 import React, { useState } from "react";
-
-export async function cleanZoomAudioFile(file: File): Promise<File> {
-  // 1. Wir lesen nur die ersten 1024 Bytes der Datei in den Speicher
-  // Das dauert Millisekunden und schont den RAM (egal ob die Datei 5 MB oder 5 GB ist)
-  const headerSlice = file.slice(0, 1024);
-  const buffer = await headerSlice.arrayBuffer();
-
-  // 2. Wir wandeln die Bytes in Text um
-  const text = new TextDecoder("ascii").decode(buffer);
-
-  // 3. Wir suchen, an welcher Position das Wort "RIFF" WIRKLICH steht
-  const riffIndex = text.indexOf("RIFF");
-
-  if (riffIndex === -1) {
-    throw new Error("Das ist absolut keine WAV-Datei (Kein RIFF gefunden).");
-  }
-
-  if (riffIndex === 0) {
-    console.log("Datei ist bereits sauber!");
-    return file; // Alles perfekt, wir geben die Originaldatei zurück
-  }
-
-  console.log(
-    `Zoom-Fehler erkannt! 'RIFF' startet erst bei Byte ${riffIndex}. Schneide Müll ab...`,
-  );
-
-  // 4. Der magische Trick: Wir erstellen einen neuen Blob, der erst ab dem RIFF-Wort beginnt!
-  // Das verbraucht keinen Arbeitsspeicher, da es nur ein "Zeiger" auf die Festplatte ist.
-  const cleanBlob = file.slice(riffIndex, file.size, "audio/wav");
-
-  return new File([cleanBlob], file.name, {
-    type: file.type || "audio/wav",
-    lastModified: file.lastModified,
-  });
-}
-
-// TypeScript Definitions for our secure Electron API bridge
-declare global {
-  interface Window {
-    electronAPI: {
-      processAudio: (
-        filePath: string,
-        tags: { title: string; artist: string },
-      ) => Promise<{
-        hasErrors: boolean;
-        fileBuffer?: ArrayBuffer;
-        fileName?: string;
-        error?: string;
-      }>;
-      saveTempFile: (file: File) => Promise<string>;
-      deleteTempFile: (filePath: string) => Promise<void>;
-      saveAndOpen: (
-        fileBuffer: ArrayBuffer,
-        fileName: string,
-      ) => Promise<{ hasErrors: boolean; error?: string }>;
-    };
-  }
-}
+import { cleanZoomAudioFile } from "../utils/audioUtils";
+import "../utils/electronAPI.types";
 
 export default function Form() {
   const [file, setFile] = useState<File | null>(null);
