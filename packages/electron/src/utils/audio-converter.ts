@@ -11,6 +11,7 @@ import {
   canEncodeAudio,
 } from 'mediabunny';
 import { registerMp3Encoder } from '@mediabunny/mp3-encoder';
+import logoAssetPath from '../assets/logo.jpg';
 
 /**
  * Converts an audio file to MP3 format with ID3 tags.
@@ -38,6 +39,10 @@ export async function convertAudioToMp3(
 
   // Read the file from disk
   const bytes = await fs.promises.readFile(filePath);
+  const resolvedLogoPath = path.isAbsolute(logoAssetPath)
+    ? logoAssetPath
+    : path.resolve(__dirname, logoAssetPath);
+  const logoBytes = await fs.promises.readFile(resolvedLogoPath);
   const source = new BlobSource(new Blob([bytes]));
 
   // Configure input with auto-format detection
@@ -59,6 +64,13 @@ export async function convertAudioToMp3(
     tags: {
       title: tags.title,
       artist: tags.artist,
+      images: [{
+        data: new Uint8Array(logoBytes),
+        mimeType: 'image/jpeg',
+        kind: 'coverFront',
+        name: 'rbtc-logo',
+        description: 'RBTC Logo'
+      }]
     },
   });
 
@@ -75,8 +87,16 @@ export async function convertAudioToMp3(
     console.log(`Conversion progress: ${progress}%`);
   };
 
+  const startTime = performance.now();
+
+
   // Execute the conversion
   await conversion.execute();
+
+  const endTime = performance.now();
+  const timeSpent = (endTime - startTime).toFixed(2); // in milliseconds
+
+  console.log(`Conversion took ${timeSpent} milliseconds`);
 
   // Derive output filename from input file
   const originalName = path.basename(filePath) || 'output';
