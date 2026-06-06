@@ -8,9 +8,6 @@
     "dev": "lerna run dev",
     "lint": "lerna run lint"
   },
-  "dependencies": {
-    "cors": "^2.8.5"
-  },
   "devDependencies": {
     "lerna": "^8.2.3"
   }
