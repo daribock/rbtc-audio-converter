@@ -66,12 +66,6 @@ app.whenReady().then(() => {
 
     identifyTrueFileFormat(filePath);
 
-    // if (fixZoomWavHeader(filePath)) {
-    //   console.log("Zoom WAV header fixed successfully.");
-    // } else {
-    //   console.warn("Failed to fix Zoom WAV header. The file may still be processed, but results could be unpredictable.");
-    // }
-
     try {
       const bytes = await fs.promises.readFile(filePath);
       const source = new BlobSource(new Blob([bytes]));
