@@ -2,13 +2,51 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Hello World!</title>
+    <title>Rbtc audio converter</title>
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-    <h1>💖 Hello World!</h1>
-    <p>Welcome to your Electron application.</p>
-    <input type="text" id="myInput" placeholder="Type something..." />
-    <button id="myButton">Save Text</button>
+    <main class="app-container">
+      <section class="card">
+        <h1>Rbtc audio converter</h1>
+        <p class="subtitle">Upload a .wav file and enter the required details.</p>
+
+        <form id="audioForm" novalidate>
+          <label for="wavFile">WAV file</label>
+          <input id="wavFile" type="file" accept=".wav,audio/wav" required />
+
+          <label for="teacherAbbr">Teacher abbreviation</label>
+          <input
+            id="teacherAbbr"
+            type="text"
+            placeholder="e.g. JD"
+            autocomplete="off"
+            required
+          />
+
+          <label for="city">City</label>
+          <input
+            id="city"
+            type="text"
+            placeholder="e.g. Berlin"
+            autocomplete="off"
+            required
+          />
+
+          <label for="subject">Subject</label>
+          <input
+            id="subject"
+            type="text"
+            placeholder="e.g. Mathematics"
+            autocomplete="off"
+            required
+          />
+
+          <button id="myButton" type="submit">Save Data</button>
+        </form>
+
+        <p id="statusMessage" class="status" aria-live="polite"></p>
+      </section>
+    </main>
   </body>
 </html>
