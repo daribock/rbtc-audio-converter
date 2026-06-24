@@ -21,8 +21,6 @@ import { registerMp3Encoder } from '@mediabunny/mp3-encoder';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
-
-
 let currentConversion: Conversion | null = null;
 
 // output.target.buffer contains the final file

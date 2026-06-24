@@ -24,6 +24,10 @@ body {
   padding: 1.25rem;
 }
 
+body.is-loading {
+  overflow: hidden;
+}
+
 .app-container {
   width: 100%;
   max-width: 34rem;
@@ -105,4 +109,52 @@ button:hover {
 
 .status.success {
   color: #027a48;
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: rgba(14, 24, 38, 0.48);
+  backdrop-filter: blur(2px);
+}
+
+.loading-overlay.hidden {
+  display: none;
+}
+
+.loading-box {
+  min-width: 16rem;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px rgba(10, 23, 42, 0.2);
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+}
+
+.loading-spinner {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 3px solid rgba(18, 105, 211, 0.2);
+  border-top-color: var(--accent);
+  animation: spin 0.9s linear infinite;
+}
+
+.loading-text {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

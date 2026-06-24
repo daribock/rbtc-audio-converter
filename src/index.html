@@ -6,10 +6,26 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
+    <div
+      id="loadingOverlay"
+      class="loading-overlay hidden"
+      role="status"
+      aria-live="polite"
+      aria-label="Conversion in progress"
+      aria-hidden="true"
+    >
+      <div class="loading-box">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <p class="loading-text">Converting audio... Please wait.</p>
+      </div>
+    </div>
+
     <main class="app-container">
       <section class="card">
         <h1>Rbtc audio converter</h1>
-        <p class="subtitle">Upload a .wav file and enter the required details.</p>
+        <p class="subtitle">
+          Upload a .wav file and enter the required details.
+        </p>
 
         <form id="audioForm" novalidate>
           <label for="wavFile">WAV file</label>
@@ -48,6 +64,6 @@
         <p id="statusMessage" class="status" aria-live="polite"></p>
       </section>
     </main>
-    <script src="renderer.js"></script>
+    <script type="module" src="renderer.js"></script>
   </body>
 </html>

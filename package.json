@@ -1,7 +1,8 @@
 {
   "name": "electron-app",
   "productName": "electron-app",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "type": "module",
   "description": "My Electron application description",
   "main": "src/index.js",
   "private": true,
@@ -19,9 +20,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@mediabunny/mp3-encoder": "^1.46.0",
+    "@mediabunny/mp3-encoder": "^1.49.0",
     "electron-squirrel-startup": "^1.0.1",
-    "mediabunny": "^1.46.0"
+    "mediabunny": "^1.49.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.11.2",
