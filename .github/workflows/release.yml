@@ -1,16 +1,16 @@
 name: release
 
 on:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - master
+  push:
+
+permissions:
+  contents: write
+  pull-requests: read
 
 jobs:
   release:
     name: Release
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -22,13 +22,9 @@ jobs:
 
       - name: Create Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.PACKAGE_VERSION }}
           name: ${{ env.PACKAGE_VERSION }}
-          # body: |
-          #   ## ${{ github.event.pull_request.title }}
 
-          #   ${{ github.event.pull_request.body }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           generate_release_notes: true
