@@ -1,6 +1,6 @@
 {
-  "name": "electron-app",
-  "productName": "electron-app",
+  "name": "rbtc-audio-converter",
+  "productName": "rbtc-audio-converter",
   "version": "0.1.0",
   "type": "module",
   "description": "My Electron application description",
@@ -32,6 +32,7 @@
     "@electron-forge/maker-zip": "^7.11.2",
     "@electron-forge/plugin-auto-unpack-natives": "^7.11.2",
     "@electron-forge/plugin-fuses": "^7.11.2",
+    "@electron-forge/publisher-github": "^7.11.2",
     "@electron/fuses": "^1.8.0",
     "electron": "42.4.0"
   }
