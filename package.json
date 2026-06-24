@@ -3,7 +3,7 @@
   "productName": "rbtc-audio-converter",
   "version": "0.2.0",
   "type": "module",
-  "description": "My Electron application description",
+  "description": "The RBTC Audio Converter is a simple Electron application that allows users to convert audio files to different formats. It supports various audio formats and provides an easy-to-use interface for quick conversions.",
   "main": "src/index.js",
   "private": true,
   "scripts": {
