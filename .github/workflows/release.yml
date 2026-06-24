@@ -26,9 +26,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.PACKAGE_VERSION }}
-          name: Version ${{ env.PACKAGE_VERSION }}
-          body: |
-            ## ${{ github.event.pull_request.title }}
+          name: ${{ env.PACKAGE_VERSION }}
+          # body: |
+          #   ## ${{ github.event.pull_request.title }}
 
-            ${{ github.event.pull_request.body }}
+          #   ${{ github.event.pull_request.body }}
           generate_release_notes: true

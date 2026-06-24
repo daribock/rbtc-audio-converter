@@ -1,7 +1,7 @@
 {
   "name": "rbtc-audio-converter",
   "productName": "rbtc-audio-converter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "My Electron application description",
   "main": "src/index.js",
