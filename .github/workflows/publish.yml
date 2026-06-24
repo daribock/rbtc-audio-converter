@@ -2,8 +2,12 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - master
+    paths-ignore:
+      - ".github/**"
+      - "docs/**"
+      - "scripts/**"
 
 permissions: {}
 
