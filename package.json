@@ -1,17 +1,38 @@
 {
-  "name": "rbtc-audio-convertor",
+  "name": "electron-app",
+  "productName": "electron-app",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "My Electron application description",
+  "main": "src/index.js",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "lerna run dev",
-    "lint": "lerna run lint"
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\""
   },
+  "keywords": [],
+  "author": {
+    "name": "Darius Kletter",
+    "email": "darikletter@gmail.com"
+  },
+  "license": "MIT",
   "dependencies": {
-    "cors": "^2.8.5"
+    "@mediabunny/mp3-encoder": "^1.49.0",
+    "electron-squirrel-startup": "^1.0.1",
+    "mediabunny": "^1.49.0"
   },
   "devDependencies": {
-    "lerna": "^8.2.3"
+    "@electron-forge/cli": "^7.11.2",
+    "@electron-forge/maker-deb": "^7.11.2",
+    "@electron-forge/maker-rpm": "^7.11.2",
+    "@electron-forge/maker-squirrel": "^7.11.2",
+    "@electron-forge/maker-zip": "^7.11.2",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.11.2",
+    "@electron-forge/plugin-fuses": "^7.11.2",
+    "@electron/fuses": "^1.8.0",
+    "electron": "42.4.0"
   }
 }
