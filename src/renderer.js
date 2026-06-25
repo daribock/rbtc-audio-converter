@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const teacherInput = document.getElementById("teacherAbbr");
   const cityInput = document.getElementById("city");
   const subjectInput = document.getElementById("subject");
+  const lessonInput = document.getElementById("lesson");
   const statusMessage = document.getElementById("statusMessage");
   const loadingOverlay = document.getElementById("loadingOverlay");
   const loadingText = loadingOverlay.querySelector(".loading-text");
@@ -53,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const teacherAbbr = teacherInput.value.trim();
     const city = cityInput.value.trim();
     const subject = subjectInput.value.trim();
+    const lesson = lessonInput.value.trim();
 
     if (!selectedFile) {
       showStatus("Please choose a .wav file.", "error");
@@ -65,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (!teacherAbbr || !city || !subject) {
+    if (!teacherAbbr || !city || !subject || !lesson) {
       showStatus("Please fill all input fields.", "error");
       return;
     }
@@ -82,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         teacher: teacherAbbr,
         city,
         subject,
+        lesson,
       });
 
       console.log(
