@@ -12,7 +12,6 @@ import {
   BlobSource,
   Mp3OutputFormat,
   ALL_FORMATS,
-  // QUALITY_MEDIUM,
   canEncodeAudio,
 } from "mediabunny";
 
@@ -82,11 +81,38 @@ const createBlobFromFilePath = async (filePath) => {
   return new Blob([bytes]);
 };
 
-const processAudioFile = async (blobFile, tags, fileName, onProgress) => {
+const createTitle = (
+  teacherAbbr,
+  city,
+  subject,
+  formattedLesson,
+  createdAt,
+) => {
+  return `${createdAt.getFullYear().toString().slice(-2)}${String(createdAt.getMonth() + 1).padStart(2, "0")}${String(createdAt.getDate()).padStart(2, "0")} ${subject} ${formattedLesson} ${city} ${teacherAbbr}`;
+};
+
+const processAudioFile = async (
+  blobFile,
+  tags,
+  fileName,
+  onProgress,
+  createdAt,
+) => {
   let currentConversion;
+  const title = createTitle(
+    tags.teacherAbbr,
+    tags.city,
+    tags.subject,
+    tags.formattedLesson,
+    createdAt,
+  );
+  const resolvedLogoPath = path.isAbsolute("./assets/logo.jpg")
+    ? "./assets/logo.jpg"
+    : path.resolve(__dirname, "./assets/logo.jpg");
 
   try {
     const cleanBlob = await cleanZoomAudioFile(blobFile);
+    const logoBytes = await fs.promises.readFile(resolvedLogoPath);
 
     // Test: Speichert die gecleante Original-WAV-Datei zum Probehören
     // const testBuffer = Buffer.from(await cleanBlob.arrayBuffer());
@@ -122,13 +148,20 @@ const processAudioFile = async (blobFile, tags, fileName, onProgress) => {
     currentConversion = await Conversion.init({
       input,
       output,
-      // audio: {
-      //   codec: "mp3",
-      //   // bitrate: QUALITY_MEDIUM, // 64 kbps (perfekt für Sprache)
-      // },
       tags: {
-        title: tags.teacherAbbr + tags.city + tags.subject,
+        title,
         artist: tags.teacherAbbr,
+        album: tags.subject,
+        trackNumber: parseInt(tags.formattedLesson, 10),
+        images: [
+          {
+            data: new Uint8Array(logoBytes),
+            mimeType: "image/jpeg",
+            kind: "coverFront",
+            name: "rbtc-logo",
+            description: "RBTC Logo",
+          },
+        ],
       },
     });
 
@@ -147,7 +180,9 @@ const processAudioFile = async (blobFile, tags, fileName, onProgress) => {
         normalizedProgress = normalizedProgress * 100;
       }
       normalizedProgress = Math.max(0, Math.min(100, normalizedProgress));
-      console.log(`[Conversion progress callback] Raw: ${progress}, Normalized: ${normalizedProgress}%`);
+      console.log(
+        `[Conversion progress callback] Raw: ${progress}, Normalized: ${normalizedProgress}%`,
+      );
       if (onProgress) {
         onProgress(normalizedProgress);
       }
@@ -159,7 +194,7 @@ const processAudioFile = async (blobFile, tags, fileName, onProgress) => {
 
     const endTime = performance.now();
 
-    const outputFileName = `rbtc-${Date.now()}.mp3`;
+    const outputFileName = `${title}.mp3`;
     const timeTakenInSeconds = ((endTime - startTime) / 1000).toFixed(2);
 
     // Return success, the full file path, and the parent folder directory
@@ -208,8 +243,18 @@ app.whenReady().then(() => {
   createWindow();
 
   ipcMain.handle("convert", async (event, filePath, tags) => {
-    const { teacher, city, subject } = tags;
-    console.log("[Index.js] Received data:", filePath, teacher, city, subject);
+    const { teacher, city, subject, lesson } = tags;
+    const formattedLesson = String(tags.lesson).padStart(2, "0");
+    const { birthtime: createdAt } = fs.statSync(filePath) || {};
+    console.log(
+      "[Index.js] Received data:",
+      filePath,
+      teacher,
+      city,
+      subject,
+      formattedLesson,
+      createdAt,
+    );
     const fileName = path.basename(filePath);
 
     try {
@@ -221,12 +266,14 @@ app.whenReady().then(() => {
           teacherAbbr: teacher,
           city,
           subject,
+          formattedLesson,
         },
         fileName,
         (progress) => {
           console.log(`[IPC send] Sending convert-progress: ${progress}%`);
           event.sender.send("convert-progress", progress);
         },
+        createdAt,
       );
 
       if (result.hasErrors) {
