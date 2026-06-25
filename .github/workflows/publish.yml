@@ -12,8 +12,34 @@ on:
 permissions: {}
 
 jobs:
+  create-draft-release:
+    name: Create Draft Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Get Version
+        run: |
+          set -e
+          # read application version from package.json
+          HEAD_VERSION=$(git show HEAD:package.json | jq -r '.version')
+          echo "VERSION=v${HEAD_VERSION}" >> $GITHUB_ENV
+
+      - name: Create Release
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+        with:
+          tag_name: ${{ env.VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: true
+          generate_release_notes: true
+
   build:
     name: Build
+    needs:
+      - create-draft-release
     strategy:
       fail-fast: false
       matrix:
@@ -97,7 +123,7 @@ jobs:
         # env:
         #   APPLE_ID: ${{ secrets.APPLE_ID }}
         #   APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-        run: npm run publish --arch=${{ matrix.arch }} --dry-run
+        run: npm run publish -- --arch=${{ matrix.arch }} --dry-run
 
       - name: Build (Windows)
         if: ${{ startsWith(matrix.os, 'windows-') }}
@@ -110,13 +136,13 @@ jobs:
         #   SM_CLIENT_CERT_FILE: ${{ env.SM_CLIENT_CERT_FILE }}
         #   SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
         #   SM_HOST: ${{ secrets.SM_HOST }}
-        run: npm run publish --arch=${{ matrix.arch }} --dry-run
+        run: npm run publish -- --arch=${{ matrix.arch }} --dry-run
 
       - name: Build (Linux)
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         env:
           GITHUB_TOKEN: ${{ secrets.RBTC_AUDIO_CONVERTER_PUBLISH_GITHUB_TOKEN }}
-        run: npm run publish --arch=${{ matrix.arch }} --dry-run
+        run: npm run publish -- --arch=${{ matrix.arch }} --dry-run
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -157,4 +183,4 @@ jobs:
       - name: Publish to GitHub
         env:
           GITHUB_TOKEN: ${{ secrets.RBTC_AUDIO_CONVERTER_PUBLISH_GITHUB_TOKEN }}
-        run: npm run publish --from-dry-run
+        run: npm run publish -- --from-dry-run
