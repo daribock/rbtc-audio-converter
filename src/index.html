@@ -17,6 +17,8 @@
       <div class="loading-box">
         <div class="loading-spinner" aria-hidden="true"></div>
         <p class="loading-text">Converting audio... Please wait.</p>
+        <div id="loadingStatusList" class="loading-status-list"></div>
+        <p id="loadingSummary" class="loading-summary"></p>
       </div>
     </div>
 
@@ -29,7 +31,18 @@
 
         <form id="audioForm" novalidate>
           <label for="wavFile">WAV file</label>
-          <input id="wavFile" type="file" accept=".wav,audio/wav" required />
+          <input
+            id="wavFile"
+            type="file"
+            accept=".wav,audio/wav"
+            multiple
+            required
+          />
+
+          <div id="fileListContainer" class="file-list-container hidden">
+            <label>Selected files and lessons</label>
+            <div id="fileList" class="file-list" aria-live="polite"></div>
+          </div>
 
           <label for="teacherAbbr">Teacher abbreviation</label>
           <input
@@ -58,16 +71,7 @@
             required
           />
 
-          <label for="lesson">Lesson</label>
-          <input
-            id="lesson"
-            type="number"
-            placeholder="e.g. 1"
-            autocomplete="off"
-            required
-          />
-
-          <button id="myButton" type="submit">Save Data</button>
+          <button id="myButton" type="submit">Convert files</button>
         </form>
 
         <p id="statusMessage" class="status" aria-live="polite"></p>
