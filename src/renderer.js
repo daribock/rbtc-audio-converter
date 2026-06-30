@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const teacherInput = document.getElementById("teacherAbbr");
   const cityInput = document.getElementById("city");
   const subjectInput = document.getElementById("subject");
+  const parallelWorkersInput = document.getElementById("parallelWorkers");
   const statusMessage = document.getElementById("statusMessage");
   const loadingOverlay = document.getElementById("loadingOverlay");
   const loadingText = loadingOverlay.querySelector(".loading-text");
@@ -221,6 +222,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const teacherAbbr = teacherInput.value.trim();
     const city = cityInput.value.trim();
     const subject = subjectInput.value.trim();
+    const parallelWorkers = Math.max(
+      1,
+      Math.min(10, Number.parseInt(parallelWorkersInput.value, 10) || 2),
+    );
 
     if (batchError) {
       showStatus(batchError, "error");
@@ -250,11 +255,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       showStatus("Converting files...");
 
-      const response = await electronAPI.convertBatch(items, {
-        teacher: teacherAbbr,
-        city,
-        subject,
-      });
+      const response = await electronAPI.convertBatch(
+        items,
+        { teacher: teacherAbbr, city, subject },
+        parallelWorkers,
+      );
 
       console.log(
         "[Renderer.js] Received response from main process:",

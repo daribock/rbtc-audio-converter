@@ -8,7 +8,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
     return ipcRenderer.invoke("convert", filePath, tags);
   },
-  convertBatch: (items, sharedTags) => {
+  convertBatch: (items, sharedTags, parallelWorkers) => {
     if (!Array.isArray(items)) {
       throw new Error("convertBatch requires an array of items.");
     }
@@ -26,7 +26,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
       };
     });
 
-    return ipcRenderer.invoke("convert-batch", payload, sharedTags);
+    return ipcRenderer.invoke("convert-batch", payload, sharedTags, parallelWorkers);
   },
   onConvertProgress: (callback) => {
     if (typeof callback !== "function") {
