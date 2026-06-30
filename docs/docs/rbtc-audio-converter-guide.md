@@ -22,7 +22,20 @@ If you do not see the assets list, the release has not been published yet.
 
 The app is not code-signed yet. That means your computer may show a security warning the first time you open it.
 
-On macOS, you may need to allow the app in **System Settings > Privacy & Security**.
+### Installation on macOs
+
+To run the app, please follow these steps:
+
+1. Download the app and drag it to your **Applications** folder.
+2. Open your **Terminal** (press `Cmd + Space`, type "Terminal", and hit Enter).
+3. Paste the following command and hit Enter:
+
+```bash
+xattr -cr /Applications/RBTC\ Audio\ Converter.app
+```
+
+### Installation on Windows
+
 On Windows, you may need to choose **More info** and then **Run anyway**.
 
 ## How to use it
