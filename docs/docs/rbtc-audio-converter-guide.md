@@ -11,7 +11,7 @@ The RBTC Audio Converter turns WAV files into MP3 files and adds the RBTC metada
 ## Download the app
 
 1. Open the GitHub repository.
-2. Go to **Releases** on the right side of the repository page.
+2. Go to **[Releases](https://github.com/daribock/rbtc-audio-converter/releases/latest)** on the right side of the repository page.
 3. Open the latest release.
 4. Scroll to **Assets**.
 5. Download the file that matches your operating system.
@@ -22,7 +22,20 @@ If you do not see the assets list, the release has not been published yet.
 
 The app is not code-signed yet. That means your computer may show a security warning the first time you open it.
 
-On macOS, you may need to allow the app in **System Settings > Privacy & Security**.
+### Installation on macOs
+
+To run the app, please follow these steps:
+
+1. Download the app and drag it to your **Applications** folder.
+2. Open your **Terminal** (press `Cmd + Space`, type "Terminal", and hit Enter).
+3. Paste the following command and hit Enter:
+
+```bash
+xattr -cr /Applications/RBTC\ Audio\ Converter.app
+```
+
+### Installation on Windows
+
 On Windows, you may need to choose **More info** and then **Run anyway**.
 
 ## How to use it
