@@ -22,7 +22,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@mediabunny/mp3-encoder": "^1.49.0",
+    "@mediabunny/mp3-encoder": "^1.50.0",
     "electron-squirrel-startup": "^1.0.1",
     "mediabunny": "^1.49.0"
   },
