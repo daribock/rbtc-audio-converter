@@ -6,7 +6,7 @@ slug: /
 
 ## What it does
 
-The RBTC Audio Converter turns WAV files into MP3 files and adds the RBTC metadata automatically. You can select up to 15 files at once, choose the lesson number for each file, and convert them in one batch.
+The RBTC Audio Converter turns WAV files into MP3 files and adds the RBTC metadata automatically. You can select up to 15 files at once, choose the lesson number for each file, and convert them in one batch, with up to 2 files being processed in parallel.
 
 ## Download the app
 
