@@ -208,10 +208,15 @@ const validateBatchRequest = (batchItems, sharedTags) => {
  * @param {Electron.IpcMainInvokeEvent} event - IPC invoke event.
  * @param {Array<{filePath: string, fileName?: string, lesson: string|number}>} batchItems - Files with lesson mapping.
  * @param {{teacher?: string, city?: string, subject?: string}} sharedTags - Shared metadata.
+ * @param {number} [parallelWorkers] - Requested parallel worker count (clamped to 1–10).
  * @returns {Promise<{hasErrors: boolean, error?: string, converted?: Array<{sourceFileName: string, outputFilePath: string, timeTaken: string}>, failed?: Array<{fileName: string, error: string}>, usedSequentialFallback?: boolean, timeTaken?: string}>} Batch conversion result.
  */
-const handleConvertBatch = async (event, batchItems, sharedTags) => {
+const handleConvertBatch = async (event, batchItems, sharedTags, parallelWorkers) => {
   const startedAt = performance.now();
+  const clampedWorkers = Math.max(
+    1,
+    Math.min(10, Number.parseInt(String(parallelWorkers), 10) || MAX_PARALLEL_WORKERS),
+  );
 
   try {
     const validation = validateBatchRequest(batchItems, sharedTags);
@@ -331,7 +336,7 @@ const handleConvertBatch = async (event, batchItems, sharedTags) => {
     let usedSequentialFallback = false;
 
     try {
-      await runParallelBatch(MAX_PARALLEL_WORKERS, normalizedItems, convertOne);
+      await runParallelBatch(clampedWorkers, normalizedItems, convertOne);
     } catch (parallelError) {
       console.error(
         "Batch parallel conversion failed, falling back to sequential:",
