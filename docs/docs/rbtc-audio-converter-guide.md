@@ -6,7 +6,7 @@ slug: /
 
 ## What it does
 
-The RBTC Audio Converter turns WAV files into MP3 files and adds the RBTC metadata automatically. You can select up to 15 files at once, choose the lesson number for each file, and convert them in one batch, with up to 2 files being processed in parallel.
+The RBTC Audio Converter turns WAV files into MP3 files and adds the RBTC metadata automatically. You can select up to 15 files at once, choose the lesson number for each file, and convert them in one batch, with the option to process between 1 and 10 files in parallel (defaults to 2).
 
 ## Download the app
 
@@ -44,8 +44,9 @@ On Windows, you may need to choose **More info** and then **Run anyway**.
 2. Select your WAV files.
 3. Set the lesson number for each file.
 4. Enter the shared metadata once: teacher, city, and subject.
-5. Click **Convert files**.
-6. Wait for the progress screen to finish.
+5. Optionally adjust the maximum number of parallel conversions (1-10).
+6. Click **Convert files**.
+7. Wait for the progress screen to finish.
 
 ## Output
 
