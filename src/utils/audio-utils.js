@@ -103,6 +103,8 @@ export const createBlobFromFilePath = async (filePath) => {
   return new Blob([bytes]);
 };
 
+const logoCache = new Map();
+
 /**
  * Converts one cleaned WAV blob into MP3 with metadata and cover image.
  *
@@ -137,7 +139,11 @@ export const processAudioFile = async ({
 
   try {
     const cleanBlob = await cleanZoomAudioFile(blobFile);
-    const logoBytes = await fs.promises.readFile(resolvedLogoPath);
+    let logoBytes = logoCache.get(resolvedLogoPath);
+    if (!logoBytes) {
+      logoBytes = await fs.promises.readFile(resolvedLogoPath);
+      logoCache.set(resolvedLogoPath, logoBytes);
+    }
 
     const source = new BlobSource(cleanBlob);
 
