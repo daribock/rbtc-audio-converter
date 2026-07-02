@@ -338,7 +338,6 @@ const handleActivate = () => {
 const onAppReady = () => {
   createWindow();
 
-  ipcMain.handle("convert", handleConvert);
   ipcMain.handle("convert-batch", handleConvertBatch);
   app.on("activate", handleActivate);
 };
