@@ -49,11 +49,15 @@ const createWindow = () => {
  * Returns a safe creation date for a source file.
  *
  * @param {string} filePath - Absolute source file path.
- * @returns {Date} File birthtime when available, otherwise current date.
+ * @returns {Promise<Date>} File birthtime when available, otherwise current date.
  */
-const getSafeCreatedAt = (filePath) => {
-  const { birthtime } = fs.statSync(filePath) || {};
-  return birthtime instanceof Date ? birthtime : new Date();
+const getSafeCreatedAt = async (filePath) => {
+  try {
+    const { birthtime } = await fs.promises.stat(filePath);
+    return birthtime instanceof Date ? birthtime : new Date();
+  } catch (err) {
+    return new Date();
+  }
 };
 
 /**
@@ -146,7 +150,7 @@ const handleConvertBatch = async (
               fileProgress: progress,
             });
           },
-          createdAt: getSafeCreatedAt(item.filePath),
+          createdAt: await getSafeCreatedAt(item.filePath),
           logoPath,
         });
 
