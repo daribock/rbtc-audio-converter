@@ -12,8 +12,8 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
-    "test": "node --test tests/file-utils.test.js tests/async-utils.test.js tests/audio-utils.test.js tests/batch-validation.test.js",
-    "test:coverage": "node --experimental-test-coverage --test tests/file-utils.test.js tests/async-utils.test.js tests/audio-utils.test.js tests/batch-validation.test.js"
+    "test": "node --test tests/file-utils.test.js tests/async-utils.test.js tests/audio-utils.test.js tests/validation.test.js",
+    "test:coverage": "node --experimental-test-coverage --test tests/file-utils.test.js tests/async-utils.test.js tests/audio-utils.test.js tests/validation.test.js"
   },
   "keywords": [],
   "author": {

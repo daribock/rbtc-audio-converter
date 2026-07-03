@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { validateBatchRequest, MAX_BATCH_FILES } from "../src/utils/batch-validation.js";
+import { validateBatchRequest, MAX_BATCH_FILES } from "../src/utils/validation.js";
 
 describe("validateBatchRequest", () => {
   it("returns error if batchItems is not an array", () => {

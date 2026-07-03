@@ -10,7 +10,7 @@ import {
 } from "./utils/audio-utils.js";
 import { normalizeLesson, resolveUniqueFilePath } from "./utils/file-utils.js";
 import { runParallelBatch } from "./utils/async-utils.js";
-import { validateBatchRequest, MAX_BATCH_FILES } from "./utils/batch-validation.js";
+import { validateBatchRequest } from "./utils/validation.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
