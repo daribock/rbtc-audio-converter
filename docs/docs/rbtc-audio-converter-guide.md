@@ -58,5 +58,6 @@ Each file name uses the WAV file's original creation date, the subject abbreviat
 
 - Only WAV files are supported. (Malformed WAV files, such as those from Zoom with invalid headers, are automatically repaired).
 - You can upload up to 15 files at a time.
-- Lesson numbers must be unique.
+- Lesson numbers must be positive whole numbers and are automatically prepopulated sequentially starting from 1.
+- Lesson numbers must be unique across all files in a single batch.
 - If two output files would have the same name, the app adds a suffix so nothing gets overwritten.
