@@ -61,3 +61,4 @@ Each file name uses the WAV file's original creation date, the subject abbreviat
 - Lesson numbers must be positive whole numbers and are automatically prepopulated sequentially starting from 1.
 - Lesson numbers must be unique across all files in a single batch.
 - If two output files would have the same name, the app adds a suffix so nothing gets overwritten.
+- The application now uses its own logo as the window icon.
