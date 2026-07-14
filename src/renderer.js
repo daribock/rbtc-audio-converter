@@ -1,3 +1,5 @@
+import { config } from "./utils/config.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const { electronAPI } = window;
   const form = document.getElementById("audioForm");
@@ -5,8 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const fileListContainer = document.getElementById("fileListContainer");
   const fileList = document.getElementById("fileList");
   const teacherInput = document.getElementById("teacherAbbr");
+  const teacherNameInput = document.getElementById("teacherName");
   const cityInput = document.getElementById("city");
+  const cityNameInput = document.getElementById("cityName");
   const subjectInput = document.getElementById("subject");
+  const subjectNameInput = document.getElementById("subjectName");
   const parallelWorkersInput = document.getElementById("parallelWorkers");
   const statusMessage = document.getElementById("statusMessage");
   const loadingOverlay = document.getElementById("loadingOverlay");
@@ -14,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loadingStatusList = document.getElementById("loadingStatusList");
   const loadingSummary = document.getElementById("loadingSummary");
   const defaultLoadingText = "Converting audio... Please wait.";
-  const maxFileCount = 15;
+  const maxFileCount = config.MAX_FILE_COUNT;
   let loadingLineStates = [];
 
   const renderLoadingLines = () => {
@@ -222,11 +227,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const { items, error: batchError } = getBatchItems();
     const teacherAbbr = teacherInput.value.trim();
+    const teacherName = teacherNameInput.value.trim();
     const city = cityInput.value.trim();
+    const cityName = cityNameInput.value.trim();
     const subject = subjectInput.value.trim();
+    const subjectName = subjectNameInput.value.trim();
     const parallelWorkers = Math.max(
       1,
-      Math.min(10, Number.parseInt(parallelWorkersInput.value, 10) || 2),
+      Math.min(
+        10,
+        Number.parseInt(parallelWorkersInput.value, 10) ||
+          config.MINIMUM_PARALLEL_WORKERS,
+      ),
     );
 
     if (batchError) {
@@ -234,7 +246,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (!teacherAbbr || !city || !subject) {
+    if (
+      !teacherAbbr ||
+      !teacherName ||
+      !city ||
+      !cityName ||
+      !subject ||
+      !subjectName
+    ) {
       showStatus("Please fill all input fields.", "error");
       return;
     }
@@ -259,7 +278,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const response = await electronAPI.convertBatch(
         items,
-        { teacher: teacherAbbr, city, subject },
+        {
+          teacher: teacherAbbr,
+          teacherName,
+          city,
+          cityName,
+          subject,
+          subjectName,
+        },
         parallelWorkers,
       );
 

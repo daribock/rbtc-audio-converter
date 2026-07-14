@@ -21,30 +21,30 @@ describe("validateBatchRequest", () => {
 
   it("returns error if sharedTags is missing teacher", () => {
     const batchItems = [{ filePath: "test.wav", lesson: "1" }];
-    const sharedTags = { city: "Berlin", subject: "Math" };
+    const sharedTags = { city: "BER", cityName: "Berlin", subject: "M", subjectName: "Math", teacherName: "Mr. Smith" };
     const result = validateBatchRequest(batchItems, sharedTags);
-    assert.equal(result.error, "Teacher, city, and subject are required for batch conversion.");
+    assert.equal(result.error, "Teacher, city, and subject abbreviations and full names are required for batch conversion.");
   });
 
   it("returns error if sharedTags is missing city", () => {
     const batchItems = [{ filePath: "test.wav", lesson: "1" }];
-    const sharedTags = { teacher: "Mr. Smith", subject: "Math" };
+    const sharedTags = { teacher: "MS", teacherName: "Mr. Smith", subject: "M", subjectName: "Math", cityName: "Berlin" };
     const result = validateBatchRequest(batchItems, sharedTags);
-    assert.equal(result.error, "Teacher, city, and subject are required for batch conversion.");
+    assert.equal(result.error, "Teacher, city, and subject abbreviations and full names are required for batch conversion.");
   });
 
   it("returns error if sharedTags is missing subject", () => {
     const batchItems = [{ filePath: "test.wav", lesson: "1" }];
-    const sharedTags = { teacher: "Mr. Smith", city: "Berlin" };
+    const sharedTags = { teacher: "MS", teacherName: "Mr. Smith", city: "BER", cityName: "Berlin", subjectName: "Math" };
     const result = validateBatchRequest(batchItems, sharedTags);
-    assert.equal(result.error, "Teacher, city, and subject are required for batch conversion.");
+    assert.equal(result.error, "Teacher, city, and subject abbreviations and full names are required for batch conversion.");
   });
 
   it("returns error if sharedTags are empty strings", () => {
     const batchItems = [{ filePath: "test.wav", lesson: "1" }];
-    const sharedTags = { teacher: "  ", city: " Berlin ", subject: "   " };
+    const sharedTags = { teacher: "  ", teacherName: "Mr. Smith", city: " BER ", cityName: "Berlin", subject: "   ", subjectName: "Math" };
     const result = validateBatchRequest(batchItems, sharedTags);
-    assert.equal(result.error, "Teacher, city, and subject are required for batch conversion.");
+    assert.equal(result.error, "Teacher, city, and subject abbreviations and full names are required for batch conversion.");
   });
 
   it("returns error if lessons are not unique", () => {
@@ -52,7 +52,7 @@ describe("validateBatchRequest", () => {
       { filePath: "test1.wav", lesson: "1" },
       { filePath: "test2.wav", lesson: "01" }, // normalizeLesson("1") === "01", so these collide
     ];
-    const sharedTags = { teacher: "Mr. Smith", city: "Berlin", subject: "Math" };
+    const sharedTags = { teacher: "MS", teacherName: "Mr. Smith", city: "BER", cityName: "Berlin", subject: "M", subjectName: "Math" };
     const result = validateBatchRequest(batchItems, sharedTags);
     assert.equal(result.error, "Lesson values must be unique across all selected files.");
   });
@@ -62,13 +62,23 @@ describe("validateBatchRequest", () => {
       { filePath: "/path/to/test1.wav", lesson: "1" },
       { filePath: "/path/to/test2.wav", fileName: "custom.wav", lesson: "2" },
     ];
-    const sharedTags = { teacher: "  Mr. Smith  ", city: " Berlin ", subject: " Math " };
+    const sharedTags = {
+      teacher: "  MS  ",
+      teacherName: "  Mr. Smith  ",
+      city: " BER ",
+      cityName: " Berlin ",
+      subject: " M ",
+      subjectName: " Math ",
+    };
     const result = validateBatchRequest(batchItems, sharedTags);
 
     assert.equal(result.error, undefined);
-    assert.equal(result.teacher, "Mr. Smith");
-    assert.equal(result.city, "Berlin");
-    assert.equal(result.subject, "Math");
+    assert.equal(result.teacher, "MS");
+    assert.equal(result.teacherName, "Mr. Smith");
+    assert.equal(result.city, "BER");
+    assert.equal(result.cityName, "Berlin");
+    assert.equal(result.subject, "M");
+    assert.equal(result.subjectName, "Math");
 
     assert.equal(result.normalizedItems.length, 2);
 

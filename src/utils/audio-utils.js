@@ -10,6 +10,7 @@ import {
   ALL_FORMATS,
   canEncodeAudio,
 } from "mediabunny";
+import { config } from "./config.js";
 
 /**
  * Creates a normalized audio title using date and metadata.
@@ -112,8 +113,11 @@ const logoCache = new Map();
  * @param {Blob} params.blobFile - Source audio blob.
  * @param {object} params.tags - Metadata tags.
  * @param {string} params.tags.teacherAbbr - Teacher abbreviation.
+ * @param {string} params.tags.teacherName - Teacher full name.
  * @param {string} params.tags.city - City abbreviation.
+ * @param {string} params.tags.cityName - City full name.
  * @param {string} params.tags.subject - Subject abbreviation.
+ * @param {string} params.tags.subjectName - Subject full name.
  * @param {string} params.tags.formattedLesson - Zero-padded lesson value.
  * @param {(progress: number) => void} [params.onProgress] - Progress callback receiving 0-100.
  * @param {Date} params.createdAt - Source creation timestamp.
@@ -132,6 +136,13 @@ export const processAudioFile = async ({
     tags.teacherAbbr,
     tags.city,
     tags.subject,
+    tags.formattedLesson,
+    createdAt,
+  );
+  const metaTitle = createTitle(
+    tags.teacherName,
+    tags.cityName,
+    tags.subjectName,
     tags.formattedLesson,
     createdAt,
   );
@@ -173,9 +184,12 @@ export const processAudioFile = async ({
       input,
       output,
       tags: {
-        title,
-        artist: tags.teacherAbbr,
-        album: tags.subject,
+        title: metaTitle,
+        artist: tags.teacherName,
+        album: tags.subjectName,
+        albumArtist: config.ALBUM_ARTISTS,
+        genre: "Christian Teaching",
+        date: createdAt,
         trackNumber: Number.parseInt(tags.formattedLesson, 10),
         images: [
           {

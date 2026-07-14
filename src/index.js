@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from "electron";
+import { config } from "./utils/config.js";
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -19,8 +20,6 @@ const __dirname = path.dirname(__filename);
 
 const downloadsPath = app.getPath("downloads");
 const logoPath = path.resolve(__dirname, "./assets/rbtc-logo-1024px.png");
-
-const MAX_PARALLEL_WORKERS = 2;
 
 registerMp3Encoder();
 
@@ -67,7 +66,8 @@ const handleConvertBatch = async (
     1,
     Math.min(
       10,
-      Number.parseInt(String(parallelWorkers), 10) || MAX_PARALLEL_WORKERS,
+      Number.parseInt(String(parallelWorkers), 10) ||
+        config.MINIMUM_PARALLEL_WORKERS,
     ),
   );
 
@@ -77,7 +77,15 @@ const handleConvertBatch = async (
       return { hasErrors: true, error: validation.error };
     }
 
-    const { normalizedItems, teacher, city, subject } = validation;
+    const {
+      normalizedItems,
+      teacher,
+      teacherName,
+      city,
+      cityName,
+      subject,
+      subjectName,
+    } = validation;
     const converted = [];
     const failed = [];
     const processedIndices = new Set();
@@ -126,8 +134,11 @@ const handleConvertBatch = async (
           blobFile: fileBlob,
           tags: {
             teacherAbbr: teacher,
+            teacherName,
             city,
+            cityName,
             subject,
+            subjectName,
             formattedLesson: item.lesson,
           },
           onProgress: (progress) => {
