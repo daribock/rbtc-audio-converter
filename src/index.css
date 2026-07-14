@@ -129,6 +129,10 @@ input:focus {
   border-color: var(--accent);
 }
 
+.hidden {
+  display: none;
+}
+
 button {
   margin-top: 0.5rem;
   border: none;

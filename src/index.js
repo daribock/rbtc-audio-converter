@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { config } from "./utils/config.js";
 import path from "node:path";
 import fs from "node:fs";
@@ -252,6 +252,7 @@ const onAppReady = () => {
   createWindow();
 
   ipcMain.handle("convert-batch", handleConvertBatch);
+  ipcMain.handle("open-downloads-folder", () => shell.openPath(downloadsPath));
   app.on("activate", handleActivate);
 };
 

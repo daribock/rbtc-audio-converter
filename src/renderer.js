@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const subjectNameInput = document.getElementById("subjectName");
   const parallelWorkersInput = document.getElementById("parallelWorkers");
   const statusMessage = document.getElementById("statusMessage");
+  const openDownloadsBtn = document.getElementById("openDownloadsBtn");
   const loadingOverlay = document.getElementById("loadingOverlay");
   const loadingText = loadingOverlay.querySelector(".loading-text");
   const loadingStatusList = document.getElementById("loadingStatusList");
@@ -73,6 +74,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!isLoading) {
       resetLoadingLines();
+    }
+
+    if (isLoading) {
+      openDownloadsBtn.classList.add("hidden");
     }
 
     document.body.classList.toggle("is-loading", isLoading);
@@ -186,6 +191,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     showStatus("");
+  });
+
+  openDownloadsBtn.addEventListener("click", () => {
+    electronAPI.openDownloadsFolder();
   });
 
   electronAPI.onConvertProgress((payload) => {
@@ -320,6 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `Conversion successful: ${convertedCount}/${items.length} files in ${response.timeTaken} seconds!`,
         "success",
       );
+      openDownloadsBtn.classList.remove("hidden");
     } catch (error) {
       showStatus(
         `Error: ${error.message || "Unexpected conversion error."}`,

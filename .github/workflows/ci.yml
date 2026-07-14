@@ -17,7 +17,7 @@ jobs:
         run: npm install
         working-directory: docs
 
-      - name: Run ESLint
+      - name: Run tsc
         run: npm run typecheck
         working-directory: docs
 
@@ -30,7 +30,7 @@ jobs:
       - name: Install modules
         run: npm install
 
-      - name: Run ESLint
+      - name: Run lint
         run: npm run lint
 
   unit-tests:
