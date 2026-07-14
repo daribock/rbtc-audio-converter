@@ -11,7 +11,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\"",
+    "lint": "eslint .",
     "test": "node --test tests/file-utils.test.js tests/async-utils.test.js tests/audio-utils.test.js tests/validation.test.js",
     "test:coverage": "node --experimental-test-coverage --test tests/file-utils.test.js tests/async-utils.test.js tests/audio-utils.test.js tests/validation.test.js"
   },
@@ -36,6 +36,9 @@
     "@electron-forge/plugin-fuses": "^7.11.2",
     "@electron-forge/publisher-github": "^7.11.2",
     "@electron/fuses": "^1.8.0",
-    "electron": "42.5.0"
+    "@eslint/js": "^10.0.1",
+    "electron": "42.5.0",
+    "eslint": "^10.7.0",
+    "globals": "^17.7.0"
   }
 }

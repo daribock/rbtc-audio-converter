@@ -2,6 +2,8 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
+import process from "node:process";
+import { Buffer } from "node:buffer";
 import squirrelStartup from "electron-squirrel-startup";
 import { registerMp3Encoder } from "@mediabunny/mp3-encoder";
 import {

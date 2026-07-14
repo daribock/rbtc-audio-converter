@@ -25,7 +25,7 @@ module.exports = {
     {
       name: "@electron-forge/maker-squirrel",
       platforms: ["win32"],
-      config: (arch) => ({
+      config: () => ({
         name: "rbtc-audio-converter",
         authors: "DK Technologies",
         exe: "rbtc-audio-converter.exe",

@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const { electronAPI } = window;
   const form = document.getElementById("audioForm");
   const fileInput = document.getElementById("wavFile");
   const fileListContainer = document.getElementById("fileListContainer");
@@ -124,9 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const files = Array.from(fileInput.files || []);
     const lessonInputs = Array.from(
       fileList.querySelectorAll(".lesson-input"),
-    ).sort(
-      (a, b) => Number(a.dataset.fileIndex) - Number(b.dataset.fileIndex),
-    );
+    ).sort((a, b) => Number(a.dataset.fileIndex) - Number(b.dataset.fileIndex));
 
     const lessons = lessonInputs.map((input) => input.value.trim());
 
@@ -146,11 +145,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return { error: "Please provide a lesson value for each selected file." };
     }
 
-    const parsedLessons = lessons.map((lessonValue) => Number.parseInt(lessonValue, 10));
+    const parsedLessons = lessons.map((lessonValue) =>
+      Number.parseInt(lessonValue, 10),
+    );
 
     if (
       parsedLessons.some(
-        (lesson) => Number.isNaN(lesson) || lesson <= 0 || !Number.isInteger(lesson),
+        (lesson) =>
+          Number.isNaN(lesson) || lesson <= 0 || !Number.isInteger(lesson),
       )
     ) {
       return { error: "Lesson values must be positive whole numbers." };
@@ -184,7 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
   electronAPI.onConvertProgress((payload) => {
     const totalFiles = Number(payload?.totalFiles) || 0;
     const fileIndex = Number(payload?.fileIndex) || 0;
-    const fileName = payload?.fileName || "Current file";
     const completedCount = Number(payload?.completedCount) || 0;
     const failedCount = Number(payload?.failedCount) || 0;
     const fileProgress = Math.round(
@@ -201,7 +202,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderLoadingLines();
 
-    const allFinished = totalFiles > 0 && completedCount + failedCount === totalFiles;
+    const allFinished =
+      totalFiles > 0 && completedCount + failedCount === totalFiles;
     const summaryLine = `Done: ${completedCount}/${totalFiles}${failedCount ? `, Failed: ${failedCount}` : ""}`;
 
     if (loadingText) {

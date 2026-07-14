@@ -52,7 +52,8 @@ export const getSafeCreatedAt = async (filePath) => {
   try {
     const { birthtime } = await fs.promises.stat(filePath);
     return birthtime instanceof Date ? birthtime : new Date();
-  } catch (err) {
+    // eslint-disable-next-line no-unused-vars
+  } catch (error) {
     return new Date();
   }
 };
