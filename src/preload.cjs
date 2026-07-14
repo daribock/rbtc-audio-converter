@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
     return ipcRenderer.invoke("convert-batch", payload, sharedTags, parallelWorkers);
   },
+  openDownloadsFolder: () => ipcRenderer.invoke("open-downloads-folder"),
   onConvertProgress: (callback) => {
     if (typeof callback !== "function") {
       throw new Error("onConvertProgress requires a function callback.");

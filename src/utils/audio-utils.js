@@ -10,6 +10,7 @@ import {
   ALL_FORMATS,
   canEncodeAudio,
 } from "mediabunny";
+import { config } from "./config.js";
 
 /**
  * Creates a normalized audio title using date and metadata.
@@ -103,6 +104,8 @@ export const createBlobFromFilePath = async (filePath) => {
   return new Blob([bytes]);
 };
 
+const logoCache = new Map();
+
 /**
  * Converts one cleaned WAV blob into MP3 with metadata and cover image.
  *
@@ -110,8 +113,11 @@ export const createBlobFromFilePath = async (filePath) => {
  * @param {Blob} params.blobFile - Source audio blob.
  * @param {object} params.tags - Metadata tags.
  * @param {string} params.tags.teacherAbbr - Teacher abbreviation.
+ * @param {string} params.tags.teacherName - Teacher full name.
  * @param {string} params.tags.city - City abbreviation.
+ * @param {string} params.tags.cityName - City full name.
  * @param {string} params.tags.subject - Subject abbreviation.
+ * @param {string} params.tags.subjectName - Subject full name.
  * @param {string} params.tags.formattedLesson - Zero-padded lesson value.
  * @param {(progress: number) => void} [params.onProgress] - Progress callback receiving 0-100.
  * @param {Date} params.createdAt - Source creation timestamp.
@@ -133,11 +139,22 @@ export const processAudioFile = async ({
     tags.formattedLesson,
     createdAt,
   );
+  const metaTitle = createTitle(
+    tags.teacherName,
+    tags.cityName,
+    tags.subjectName,
+    tags.formattedLesson,
+    createdAt,
+  );
   const resolvedLogoPath = path.resolve(logoPath);
 
   try {
     const cleanBlob = await cleanZoomAudioFile(blobFile);
-    const logoBytes = await fs.promises.readFile(resolvedLogoPath);
+    let logoBytes = logoCache.get(resolvedLogoPath);
+    if (!logoBytes) {
+      logoBytes = await fs.promises.readFile(resolvedLogoPath);
+      logoCache.set(resolvedLogoPath, logoBytes);
+    }
 
     const source = new BlobSource(cleanBlob);
 
@@ -167,9 +184,12 @@ export const processAudioFile = async ({
       input,
       output,
       tags: {
-        title,
-        artist: tags.teacherAbbr,
-        album: tags.subject,
+        title: metaTitle,
+        artist: tags.teacherName,
+        album: tags.subjectName,
+        albumArtist: config.ALBUM_ARTISTS,
+        genre: "Christian Teaching",
+        date: createdAt,
         trackNumber: Number.parseInt(tags.formattedLesson, 10),
         images: [
           {

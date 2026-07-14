@@ -1,5 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { setImmediate } from "node:timers";
 import { runParallelBatch } from "../src/utils/async-utils.js";
 
 describe("runParallelBatch", () => {

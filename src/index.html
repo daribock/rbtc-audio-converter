@@ -48,7 +48,16 @@
           <input
             id="teacherAbbr"
             type="text"
-            placeholder="e.g. MM (Max Mustermann)"
+            placeholder="e.g. MM"
+            autocomplete="off"
+            required
+          />
+
+          <label for="teacherName">Teacher full name</label>
+          <input
+            id="teacherName"
+            type="text"
+            placeholder="e.g. Max Mustermann"
             autocomplete="off"
             required
           />
@@ -57,7 +66,16 @@
           <input
             id="city"
             type="text"
-            placeholder="e.g. MN (München)"
+            placeholder="e.g. MN"
+            autocomplete="off"
+            required
+          />
+
+          <label for="cityName">City full name</label>
+          <input
+            id="cityName"
+            type="text"
+            placeholder="e.g. München"
             autocomplete="off"
             required
           />
@@ -66,7 +84,16 @@
           <input
             id="subject"
             type="text"
-            placeholder="e.g. CH (Christus der Heiler)"
+            placeholder="e.g. CH"
+            autocomplete="off"
+            required
+          />
+
+          <label for="subjectName">Subject full name</label>
+          <input
+            id="subjectName"
+            type="text"
+            placeholder="e.g. Christus der Heiler"
             autocomplete="off"
             required
           />
@@ -86,6 +113,7 @@
         </form>
 
         <p id="statusMessage" class="status" aria-live="polite"></p>
+        <button id="openDownloadsBtn" class="hidden" type="button">Open Downloads Folder</button>
       </section>
     </main>
     <script type="module" src="renderer.js"></script>

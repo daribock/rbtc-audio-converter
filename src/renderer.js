@@ -1,19 +1,26 @@
+import { config } from "./utils/config.js";
+
 document.addEventListener("DOMContentLoaded", () => {
+  const { electronAPI } = window;
   const form = document.getElementById("audioForm");
   const fileInput = document.getElementById("wavFile");
   const fileListContainer = document.getElementById("fileListContainer");
   const fileList = document.getElementById("fileList");
   const teacherInput = document.getElementById("teacherAbbr");
+  const teacherNameInput = document.getElementById("teacherName");
   const cityInput = document.getElementById("city");
+  const cityNameInput = document.getElementById("cityName");
   const subjectInput = document.getElementById("subject");
+  const subjectNameInput = document.getElementById("subjectName");
   const parallelWorkersInput = document.getElementById("parallelWorkers");
   const statusMessage = document.getElementById("statusMessage");
+  const openDownloadsBtn = document.getElementById("openDownloadsBtn");
   const loadingOverlay = document.getElementById("loadingOverlay");
   const loadingText = loadingOverlay.querySelector(".loading-text");
   const loadingStatusList = document.getElementById("loadingStatusList");
   const loadingSummary = document.getElementById("loadingSummary");
   const defaultLoadingText = "Converting audio... Please wait.";
-  const maxFileCount = 15;
+  const maxFileCount = config.MAX_FILE_COUNT;
   let loadingLineStates = [];
 
   const renderLoadingLines = () => {
@@ -67,6 +74,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!isLoading) {
       resetLoadingLines();
+    }
+
+    if (isLoading) {
+      openDownloadsBtn.classList.add("hidden");
     }
 
     document.body.classList.toggle("is-loading", isLoading);
@@ -124,9 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const files = Array.from(fileInput.files || []);
     const lessonInputs = Array.from(
       fileList.querySelectorAll(".lesson-input"),
-    ).sort(
-      (a, b) => Number(a.dataset.fileIndex) - Number(b.dataset.fileIndex),
-    );
+    ).sort((a, b) => Number(a.dataset.fileIndex) - Number(b.dataset.fileIndex));
 
     const lessons = lessonInputs.map((input) => input.value.trim());
 
@@ -146,11 +155,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return { error: "Please provide a lesson value for each selected file." };
     }
 
-    const parsedLessons = lessons.map((lessonValue) => Number.parseInt(lessonValue, 10));
+    const parsedLessons = lessons.map((lessonValue) =>
+      Number.parseInt(lessonValue, 10),
+    );
 
     if (
       parsedLessons.some(
-        (lesson) => Number.isNaN(lesson) || lesson <= 0 || !Number.isInteger(lesson),
+        (lesson) =>
+          Number.isNaN(lesson) || lesson <= 0 || !Number.isInteger(lesson),
       )
     ) {
       return { error: "Lesson values must be positive whole numbers." };
@@ -181,10 +193,13 @@ document.addEventListener("DOMContentLoaded", () => {
     showStatus("");
   });
 
+  openDownloadsBtn.addEventListener("click", () => {
+    electronAPI.openDownloadsFolder();
+  });
+
   electronAPI.onConvertProgress((payload) => {
     const totalFiles = Number(payload?.totalFiles) || 0;
     const fileIndex = Number(payload?.fileIndex) || 0;
-    const fileName = payload?.fileName || "Current file";
     const completedCount = Number(payload?.completedCount) || 0;
     const failedCount = Number(payload?.failedCount) || 0;
     const fileProgress = Math.round(
@@ -201,7 +216,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderLoadingLines();
 
-    const allFinished = totalFiles > 0 && completedCount + failedCount === totalFiles;
+    const allFinished =
+      totalFiles > 0 && completedCount + failedCount === totalFiles;
     const summaryLine = `Done: ${completedCount}/${totalFiles}${failedCount ? `, Failed: ${failedCount}` : ""}`;
 
     if (loadingText) {
@@ -220,11 +236,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const { items, error: batchError } = getBatchItems();
     const teacherAbbr = teacherInput.value.trim();
+    const teacherName = teacherNameInput.value.trim();
     const city = cityInput.value.trim();
+    const cityName = cityNameInput.value.trim();
     const subject = subjectInput.value.trim();
+    const subjectName = subjectNameInput.value.trim();
     const parallelWorkers = Math.max(
       1,
-      Math.min(10, Number.parseInt(parallelWorkersInput.value, 10) || 2),
+      Math.min(
+        10,
+        Number.parseInt(parallelWorkersInput.value, 10) ||
+          config.MINIMUM_PARALLEL_WORKERS,
+      ),
     );
 
     if (batchError) {
@@ -232,7 +255,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (!teacherAbbr || !city || !subject) {
+    if (
+      !teacherAbbr ||
+      !teacherName ||
+      !city ||
+      !cityName ||
+      !subject ||
+      !subjectName
+    ) {
       showStatus("Please fill all input fields.", "error");
       return;
     }
@@ -257,7 +287,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const response = await electronAPI.convertBatch(
         items,
-        { teacher: teacherAbbr, city, subject },
+        {
+          teacher: teacherAbbr,
+          teacherName,
+          city,
+          cityName,
+          subject,
+          subjectName,
+        },
         parallelWorkers,
       );
 
@@ -292,6 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `Conversion successful: ${convertedCount}/${items.length} files in ${response.timeTaken} seconds!`,
         "success",
       );
+      openDownloadsBtn.classList.remove("hidden");
     } catch (error) {
       showStatus(
         `Error: ${error.message || "Unexpected conversion error."}`,

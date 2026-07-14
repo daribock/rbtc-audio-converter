@@ -1,14 +1,17 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { config } from "./utils/config.js";
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
+import process from "node:process";
+import { Buffer } from "node:buffer";
 import squirrelStartup from "electron-squirrel-startup";
 import { registerMp3Encoder } from "@mediabunny/mp3-encoder";
 import {
   createBlobFromFilePath,
   processAudioFile,
 } from "./utils/audio-utils.js";
-import { resolveUniqueFilePath } from "./utils/file-utils.js";
+import { resolveUniqueFilePath, getSafeCreatedAt } from "./utils/file-utils.js";
 import { runParallelBatch } from "./utils/async-utils.js";
 import { validateBatchRequest } from "./utils/validation.js";
 
@@ -16,9 +19,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const downloadsPath = app.getPath("downloads");
-const logoPath = path.resolve(__dirname, "./assets/logo.jpg");
-
-const MAX_PARALLEL_WORKERS = 2;
+const logoPath = path.resolve(__dirname, "./assets/rbtc-logo-1024px.png");
 
 registerMp3Encoder();
 
@@ -46,17 +47,6 @@ const createWindow = () => {
 };
 
 /**
- * Returns a safe creation date for a source file.
- *
- * @param {string} filePath - Absolute source file path.
- * @returns {Date} File birthtime when available, otherwise current date.
- */
-const getSafeCreatedAt = (filePath) => {
-  const { birthtime } = fs.statSync(filePath) || {};
-  return birthtime instanceof Date ? birthtime : new Date();
-};
-
-/**
  * Converts multiple files and streams structured progress updates.
  *
  * @param {Electron.IpcMainInvokeEvent} event - IPC invoke event.
@@ -76,7 +66,8 @@ const handleConvertBatch = async (
     1,
     Math.min(
       10,
-      Number.parseInt(String(parallelWorkers), 10) || MAX_PARALLEL_WORKERS,
+      Number.parseInt(String(parallelWorkers), 10) ||
+        config.MINIMUM_PARALLEL_WORKERS,
     ),
   );
 
@@ -86,7 +77,15 @@ const handleConvertBatch = async (
       return { hasErrors: true, error: validation.error };
     }
 
-    const { normalizedItems, teacher, city, subject } = validation;
+    const {
+      normalizedItems,
+      teacher,
+      teacherName,
+      city,
+      cityName,
+      subject,
+      subjectName,
+    } = validation;
     const converted = [];
     const failed = [];
     const processedIndices = new Set();
@@ -135,8 +134,11 @@ const handleConvertBatch = async (
           blobFile: fileBlob,
           tags: {
             teacherAbbr: teacher,
+            teacherName,
             city,
+            cityName,
             subject,
+            subjectName,
             formattedLesson: item.lesson,
           },
           onProgress: (progress) => {
@@ -146,7 +148,7 @@ const handleConvertBatch = async (
               fileProgress: progress,
             });
           },
-          createdAt: getSafeCreatedAt(item.filePath),
+          createdAt: await getSafeCreatedAt(item.filePath),
           logoPath,
         });
 
@@ -250,6 +252,7 @@ const onAppReady = () => {
   createWindow();
 
   ipcMain.handle("convert-batch", handleConvertBatch);
+  ipcMain.handle("open-downloads-folder", () => shell.openPath(downloadsPath));
   app.on("activate", handleActivate);
 };
 
