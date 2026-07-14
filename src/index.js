@@ -18,7 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const downloadsPath = app.getPath("downloads");
-const logoPath = path.resolve(__dirname, "./assets/logo.jpg");
+const logoPath = path.resolve(__dirname, "./assets/rbtc-logo-1024px.png");
 
 const MAX_PARALLEL_WORKERS = 2;
 

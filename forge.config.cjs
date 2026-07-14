@@ -2,12 +2,10 @@ const { FusesPlugin } = require("@electron-forge/plugin-fuses");
 const { FuseV1Options, FuseVersion } = require("@electron/fuses");
 
 const commonLinuxConfig = {
-  categories: ["Audio converter", "Utility"],
-  // icon: {
-  //   "1024x1024": path.resolve(iconDir, "fiddle.png"),
-  //   scalable: path.resolve(iconDir, "fiddle.svg"),
-  // },
-  // mimeType: ["x-scheme-handler/electron-fiddle"],
+  options: {
+    categories: ["Audio", "Utility"],
+    icon: "src/assets/rbtc-logo-1024px.png",
+  },
 };
 
 module.exports = {
@@ -19,6 +17,8 @@ module.exports = {
       CompanyName: "DK Technologies",
       OriginalFilename: "RBTC Audio Converter",
     },
+    // no file extension required
+    icon: "src/assets/rbtc-logo",
   },
   rebuildConfig: {},
   makers: [

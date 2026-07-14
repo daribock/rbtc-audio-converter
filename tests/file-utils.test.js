@@ -1,9 +1,14 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { writeFile, unlink } from "node:fs/promises";
-import { normalizeLesson, resolveUniqueFilePath } from "../src/utils/file-utils.js";
+import {
+  getSafeCreatedAt,
+  normalizeLesson,
+  resolveUniqueFilePath,
+} from "../src/utils/file-utils.js";
 
 describe("normalizeLesson", () => {
   it("returns '01' for input 1", () => {
@@ -92,6 +97,45 @@ describe("resolveUniqueFilePath", () => {
       assert.ok(result.endsWith(".mp3"), `Expected .mp3 extension, got: ${result}`);
     } finally {
       await unlink(candidate).catch(() => {});
+    }
+  });
+});
+
+describe("getSafeCreatedAt", () => {
+  const dir = tmpdir();
+
+  it("returns the file birthtime when stat succeeds", async () => {
+    const candidate = join(dir, `rbtc-created-at-${Date.now()}.mp3`);
+    await writeFile(candidate, "");
+
+    try {
+      const createdAt = await getSafeCreatedAt(candidate);
+      const { birthtime } = await fs.promises.stat(candidate);
+
+      assert.ok(createdAt instanceof Date);
+      assert.equal(createdAt.getTime(), birthtime.getTime());
+    } finally {
+      await unlink(candidate).catch(() => {});
+    }
+  });
+
+  it("returns the current date when stat throws", async () => {
+    const originalStat = fs.promises.stat;
+    const before = Date.now();
+
+    fs.promises.stat = async () => {
+      throw new Error("stat failed");
+    };
+
+    try {
+      const createdAt = await getSafeCreatedAt("/does/not/exist.mp3");
+      const after = Date.now();
+
+      assert.ok(createdAt instanceof Date);
+      assert.ok(createdAt.getTime() >= before);
+      assert.ok(createdAt.getTime() <= after);
+    } finally {
+      fs.promises.stat = originalStat;
     }
   });
 });
