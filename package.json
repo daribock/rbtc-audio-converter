@@ -36,6 +36,6 @@
     "@electron-forge/plugin-fuses": "^7.11.2",
     "@electron-forge/publisher-github": "^7.11.2",
     "@electron/fuses": "^1.8.0",
-    "electron": "42.5.0"
+    "electron": "43.0.0"
   }
 }
