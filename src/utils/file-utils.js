@@ -41,3 +41,18 @@ export const resolveUniqueFilePath = async (candidatePath) => {
     }
   }
 };
+
+/**
+ * Returns a safe creation date for a source file.
+ *
+ * @param {string} filePath - Absolute source file path.
+ * @returns {Promise<Date>} File birthtime when available, otherwise current date.
+ */
+export const getSafeCreatedAt = async (filePath) => {
+  try {
+    const { birthtime } = await fs.promises.stat(filePath);
+    return birthtime instanceof Date ? birthtime : new Date();
+  } catch (err) {
+    return new Date();
+  }
+};

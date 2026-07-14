@@ -8,7 +8,7 @@ import {
   createBlobFromFilePath,
   processAudioFile,
 } from "./utils/audio-utils.js";
-import { resolveUniqueFilePath } from "./utils/file-utils.js";
+import { resolveUniqueFilePath, getSafeCreatedAt } from "./utils/file-utils.js";
 import { runParallelBatch } from "./utils/async-utils.js";
 import { validateBatchRequest } from "./utils/validation.js";
 
@@ -43,21 +43,6 @@ const createWindow = () => {
   });
 
   mainWindow.loadFile(path.join(__dirname, "index.html"));
-};
-
-/**
- * Returns a safe creation date for a source file.
- *
- * @param {string} filePath - Absolute source file path.
- * @returns {Promise<Date>} File birthtime when available, otherwise current date.
- */
-const getSafeCreatedAt = async (filePath) => {
-  try {
-    const { birthtime } = await fs.promises.stat(filePath);
-    return birthtime instanceof Date ? birthtime : new Date();
-  } catch (err) {
-    return new Date();
-  }
 };
 
 /**
