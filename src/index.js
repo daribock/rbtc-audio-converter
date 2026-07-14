@@ -8,7 +8,7 @@ import {
   createBlobFromFilePath,
   processAudioFile,
 } from "./utils/audio-utils.js";
-import { normalizeLesson, resolveUniqueFilePath } from "./utils/file-utils.js";
+import { resolveUniqueFilePath } from "./utils/file-utils.js";
 import { runParallelBatch } from "./utils/async-utils.js";
 import { validateBatchRequest } from "./utils/validation.js";
 
@@ -57,106 +57,6 @@ const getSafeCreatedAt = (filePath) => {
 };
 
 /**
- * Emits structured single-file progress updates to the renderer process.
- *
- * @param {Electron.IpcMainInvokeEvent} event - IPC event sender.
- * @param {string} fileName - Source file name shown in UI.
- * @param {number} progress - Current file progress in percent.
- * @param {number} completedCount - Completed file count.
- * @param {number} failedCount - Failed file count.
- * @returns {void}
- */
-const emitSingleConvertProgress = (
-  event,
-  fileName,
-  progress,
-  completedCount,
-  failedCount,
-) => {
-  event.sender.send("convert-progress", {
-    totalFiles: 1,
-    fileIndex: 0,
-    fileName,
-    fileProgress: progress,
-    completedCount,
-    failedCount,
-  });
-};
-
-/**
- * Converts one file using shared metadata and reports progress.
- *
- * @param {Electron.IpcMainInvokeEvent} event - IPC invoke event.
- * @param {string} filePath - Absolute source WAV path.
- * @param {{teacher: string, city: string, subject: string, lesson: string|number}} tags - User metadata.
- * @returns {Promise<{hasErrors: boolean, error?: string, filePath?: string, timeTaken?: string}>} Single conversion result.
- */
-const handleConvert = async (event, filePath, tags) => {
-  const teacher = String(tags?.teacher || "").trim();
-  const city = String(tags?.city || "").trim();
-  const subject = String(tags?.subject || "").trim();
-  const formattedLesson = normalizeLesson(tags?.lesson);
-
-  console.log(
-    "[index.js] Received single convert request:",
-    filePath,
-    teacher,
-    city,
-    subject,
-    formattedLesson,
-  );
-
-  try {
-    const fileBlob = await createBlobFromFilePath(filePath);
-    const fileName = path.basename(filePath);
-
-    /**
-     * Forwards conversion progress to the renderer.
-     *
-     * @param {number} progress - Conversion progress value from 0 to 100.
-     * @returns {void}
-     */
-    const forwardProgress = (progress) => {
-      emitSingleConvertProgress(event, fileName, progress, 0, 0);
-    };
-
-    const result = await processAudioFile({
-      blobFile: fileBlob,
-      tags: {
-        teacherAbbr: teacher,
-        city,
-        subject,
-        formattedLesson,
-      },
-      onProgress: forwardProgress,
-      createdAt: getSafeCreatedAt(filePath),
-      logoPath,
-    });
-
-    if (result.hasErrors) {
-      return { hasErrors: true, error: result.error };
-    }
-
-    const outputFilePath = await resolveUniqueFilePath(
-      path.join(downloadsPath, result.fileName),
-    );
-
-    await fs.promises.writeFile(outputFilePath, Buffer.from(result.fileBuffer));
-    emitSingleConvertProgress(event, fileName, 100, 1, 0);
-
-    console.log("Converted file saved successfully:", outputFilePath);
-    return {
-      hasErrors: false,
-      filePath: outputFilePath,
-      timeTaken: result.timeTaken,
-    };
-  } catch (error) {
-    console.error("Error during conversion:", error);
-    return { hasErrors: true, error: error.message };
-  }
-};
-
-/**
  * Converts multiple files and streams structured progress updates.
  *
  * @param {Electron.IpcMainInvokeEvent} event - IPC invoke event.
@@ -165,11 +65,19 @@ const handleConvert = async (event, filePath, tags) => {
  * @param {number} [parallelWorkers] - Requested parallel worker count (clamped to 1–10).
  * @returns {Promise<{hasErrors: boolean, error?: string, converted?: Array<{sourceFileName: string, outputFilePath: string, timeTaken: string}>, failed?: Array<{fileName: string, error: string}>, usedSequentialFallback?: boolean, timeTaken?: string}>} Batch conversion result.
  */
-const handleConvertBatch = async (event, batchItems, sharedTags, parallelWorkers) => {
+const handleConvertBatch = async (
+  event,
+  batchItems,
+  sharedTags,
+  parallelWorkers,
+) => {
   const startedAt = performance.now();
   const clampedWorkers = Math.max(
     1,
-    Math.min(10, Number.parseInt(String(parallelWorkers), 10) || MAX_PARALLEL_WORKERS),
+    Math.min(
+      10,
+      Number.parseInt(String(parallelWorkers), 10) || MAX_PARALLEL_WORKERS,
+    ),
   );
 
   try {
@@ -259,7 +167,10 @@ const handleConvertBatch = async (event, batchItems, sharedTags, parallelWorkers
           path.join(downloadsPath, result.fileName),
         );
 
-        await fs.promises.writeFile(outputFilePath, Buffer.from(result.fileBuffer));
+        await fs.promises.writeFile(
+          outputFilePath,
+          Buffer.from(result.fileBuffer),
+        );
 
         converted.push({
           sourceFileName: item.fileName,
