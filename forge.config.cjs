@@ -1,10 +1,16 @@
+/* eslint-disable no-undef */
+const path = require("path");
 const { FusesPlugin } = require("@electron-forge/plugin-fuses");
 const { FuseV1Options, FuseVersion } = require("@electron/fuses");
+const packageJson = require("./package.json");
+
+const { version } = packageJson;
+const iconDir = path.resolve(__dirname, "src", "assets");
 
 const commonLinuxConfig = {
-  options: {
-    categories: ["Audio", "Utility"],
-    icon: "src/assets/rbtc-logo-1024px.png",
+  categories: ["Audio", "Utility"],
+  icon: {
+    "1024x1024": path.resolve(iconDir, "rbtc-logo-1024px.png"),
   },
 };
 
@@ -18,23 +24,22 @@ module.exports = {
       OriginalFilename: "RBTC Audio Converter",
     },
     // no file extension required
-    icon: "src/assets/rbtc-logo",
+    icon: path.resolve(iconDir, "rbtc-logo"),
   },
   rebuildConfig: {},
   makers: [
     {
       name: "@electron-forge/maker-squirrel",
       platforms: ["win32"],
-      config: () => ({
+      config: (arch) => ({
         name: "rbtc-audio-converter",
-        authors: "DK Technologies",
+        authors: "Darius Kletter",
         exe: "rbtc-audio-converter.exe",
-        // iconUrl:
-        //   "https://raw.githubusercontent.com/darikletter/rbtc-audio-converter/master/assets/icons/rbtc-audio-converter.ico",
+        // iconUrl: "https://raw.githubusercontent.com/darikletter/rbtc-audio-converter/master/assets/icons/rbtc-audio-converter.ico",
         // loadingGif: "./assets/loading.gif",
-        // noMsi: true,
-        // setupExe: `rbtc-audio-converter-${version}-win32-${arch}-setup.exe`,
-        // setupIcon: path.resolve(iconDir, "rbtc-audio-converter.ico"),
+        noMsi: true,
+        setupExe: `rbtc-audio-converter-${version}-win32-${arch}-setup.exe`,
+        setupIcon: path.resolve(iconDir, "rbtc-logo.ico"),
         // signWithParams: process.env.CERT_FINGERPRINT
         //   ? `/sha1 ${process.env.CERT_FINGERPRINT} /tr http://timestamp.digicert.com /td SHA256 /fd SHA256`
         //   : undefined,
@@ -43,6 +48,7 @@ module.exports = {
     {
       name: "@electron-forge/maker-zip",
       platforms: ["darwin"],
+      config: {},
     },
     {
       name: "@electron-forge/maker-deb",
