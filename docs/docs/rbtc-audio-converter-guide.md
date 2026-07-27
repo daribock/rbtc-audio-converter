@@ -43,7 +43,7 @@ On Windows, you may need to choose **More info** and then **Run anyway**.
 1. Open the app.
 2. Select your WAV files.
 3. Set the lesson number for each file.
-4. Enter the shared metadata abbreviations once: teacher, city, and subject.
+4. Enter the shared metadata abbreviations and full names once: teacher, city, and subject.
 5. Optionally adjust the maximum number of parallel conversions (1-10).
 6. Click **Convert files**.
 7. Wait for the progress screen to finish.
@@ -52,7 +52,7 @@ On Windows, you may need to choose **More info** and then **Run anyway**.
 
 The app saves the converted MP3 files to your Downloads folder.
 
-Each file name uses the WAV file's original creation date, the subject abbreviation, lesson number, city abbreviation, and teacher abbreviation (e.g., `240625 CH 01 MN MM.mp3`), so the files stay organized.
+Each file name uses the WAV file's original creation date, the subject abbreviation, lesson number, city abbreviation, and teacher abbreviation (e.g., `240625 CH 01 MN MM.mp3`), so the files stay organized. The full names are added as audio metadata.
 
 ## Notes
 
