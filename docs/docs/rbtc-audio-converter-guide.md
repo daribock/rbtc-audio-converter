@@ -46,7 +46,7 @@ On Windows, you may need to choose **More info** and then **Run anyway**.
 4. Enter the shared metadata abbreviations and full names once: teacher, city, and subject.
 5. Optionally adjust the maximum number of parallel conversions (1-10).
 6. Click **Convert files**.
-7. Wait for the progress screen to finish.
+7. Wait for the progress screen to finish. Upon successful conversion, a button will appear to open your Downloads folder directly.
 
 ## Output
 
